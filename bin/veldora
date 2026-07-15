@@ -1,0 +1,33 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+$autoloader = null;
+$paths = [
+    __DIR__ . '/../vendor/autoload.php',
+    __DIR__ . '/../../../autoload.php',
+    __DIR__ . '/../../vendor/autoload.php',
+    __DIR__ . '/../../autoload.php',
+];
+
+foreach ($paths as $path) {
+    if (file_exists($path)) {
+        $autoloader = $path;
+        break;
+    }
+}
+
+if (!$autoloader) {
+    echo "Composer autoloader not found. Please run 'composer install'.\n";
+    exit(1);
+}
+
+require $autoloader;
+
+use Symfony\Component\Console\Application;
+use Veldora\Installer\Console\NewCommand;
+
+$app = new Application('Veldora Framework Scaffolder', '0.1.0');
+$app->add(new NewCommand());
+$app->run();
