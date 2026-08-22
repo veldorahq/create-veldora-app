@@ -1,0 +1,172 @@
+<?php
+
+declare(strict_types=1);
+
+use Veldora\Framework\Auth\AuthManager;
+use Veldora\Framework\Config\Config;
+use Veldora\Framework\Config\Env;
+use Veldora\Framework\Foundation\Application;
+use Veldora\Framework\Session\Session;
+
+if (!function_exists('config')) {
+    /**
+     * Get or set configuration values.
+     */
+    function config(string $key, mixed $default = null): mixed
+    {
+        $app = Application::getInstance();
+        /** @var Config $config */
+        $config = $app->get(Config::class);
+        return $config->get($key, $default);
+    }
+}
+
+if (!function_exists('env')) {
+    /**
+     * Get an environment variable value from the Veldora .env loader.
+     *
+     * Supports Veldora's typed .env format:
+     *   APP_DEBUG:bool = true
+     *   DB_PORT:int    = 3306
+     */
+    function env(string $key, mixed $default = null): mixed
+    {
+        return Env::get($key, $default);
+    }
+}
+
+if (!function_exists('session')) {
+    /**
+     * Get the session instance or retrieve a value.
+     */
+    function session(?string $key = null, mixed $default = null): mixed
+    {
+        $app = Application::getInstance();
+        /** @var Session $session */
+        $session = $app->get(Session::class);
+
+        if ($key === null) {
+            return $session;
+        }
+
+        return $session->get($key, $default);
+    }
+}
+
+if (!function_exists('csrf_token')) {
+    /**
+     * Get the active CSRF token.
+     */
+    function csrf_token(): string
+    {
+        return session()->csrfToken();
+    }
+}
+
+if (!function_exists('csrf_field')) {
+    /**
+     * Generate a CSRF hidden input field HTML snippet.
+     */
+    function csrf_field(): string
+    {
+        $token = csrf_token();
+        return '<input type="hidden" name="_token" value="' . htmlspecialchars($token, ENT_QUOTES, 'UTF-8') . '">';
+    }
+}
+
+if (!function_exists('auth')) {
+    /**
+     * Get the AuthManager instance.
+     */
+    function auth(): AuthManager
+    {
+        $app = Application::getInstance();
+        return $app->get(AuthManager::class);
+    }
+}
+
+if (!function_exists('url')) {
+    /**
+     * Generate a URL with optional signed signature.
+     */
+    function url(string $path, bool $signed = false, ?int $expiresAt = null): string
+    {
+        $scheme = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
+        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+        $base = $scheme . '://' . $host;
+        $fullUrl = $base . '/' . ltrim($path, '/');
+
+        if ($signed) {
+            return \Veldora\Framework\Support\UrlSigner::signed($fullUrl, $expiresAt);
+        }
+
+        return $fullUrl;
+    }
+}
+
+if (!function_exists('signed_url')) {
+    /**
+     * Generate a signed URL (permanent).
+     */
+    function signed_url(string $path): string
+    {
+        return url($path, true);
+    }
+}
+
+if (!function_exists('temporary_signed_url')) {
+    /**
+     * Generate a signed URL that expires after a given number of seconds.
+     */
+    function temporary_signed_url(string $path, int $expiresInSeconds): string
+    {
+        return url($path, true, time() + $expiresInSeconds);
+    }
+}
+
+if (!function_exists('redirect')) {
+    /**
+     * Create a redirect Response.
+     */
+    function redirect(string $to, int $status = 302): \Veldora\Framework\Http\Response
+    {
+        return \Veldora\Framework\Http\Response::redirect($to, $status);
+    }
+}
+
+if (!function_exists('back')) {
+    /**
+     * Create a redirect Response back to the previous URL.
+     */
+    function back(int $status = 302): \Veldora\Framework\Http\Response
+    {
+        $referer = $_SERVER['HTTP_REFERER'] ?? '/';
+        return redirect($referer, $status);
+    }
+}
+
+if (!function_exists('abort')) {
+    /**
+     * Abort the request with an HTTP error response.
+     */
+    function abort(int $code, string $message = ''): never
+    {
+        $messages = [
+            400 => 'Bad Request',
+            401 => 'Unauthorized',
+            403 => 'Forbidden',
+            404 => 'Not Found',
+            405 => 'Method Not Allowed',
+            419 => 'Page Expired',
+            422 => 'Unprocessable Entity',
+            429 => 'Too Many Requests',
+            500 => 'Internal Server Error',
+        ];
+
+        $text = $message !== '' ? $message : ($messages[$code] ?? 'Error');
+        $response = new \Veldora\Framework\Http\Response($text, $code);
+        $response->send();
+        exit($code);
+    }
+}
+

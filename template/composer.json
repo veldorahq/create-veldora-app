@@ -4,14 +4,17 @@
     "license": "MIT",
     "type": "project",
     "require": {
-        "php": "^8.2 || ^8.3",
-        "veldora/framework": "^0.4.0",
-        "veldora/ui": "^0.4.0"
+        "php": "^8.2 || ^8.3"
     },
     "autoload": {
         "psr-4": {
-            "App\\": "app/"
-        }
+            "App\\": "app/",
+            "Veldora\\Framework\\": "src/Framework/",
+            "Veldora\\UI\\": "src/UI/"
+        },
+        "files": [
+            "src/Framework/helpers.php"
+        ]
     },
     "scripts": {
         "serve": "php veldora serve",

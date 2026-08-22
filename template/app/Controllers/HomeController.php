@@ -18,18 +18,27 @@ class HomeController
     }
 
     /**
-     * Render the homepage template with SQLite database inputs.
+     * Render the homepage template.
      */
     public function index(): Response
     {
-        $post = Post::find(1);
-        $postTitle = $post ? $post->title : 'No posts found';
-        $postBody = $post ? $post->body : 'Run migration and seeder to create content.';
+        $postTitle = 'Welcome to Veldora';
+        $postBody  = 'The modern PHP framework you actually own. Build blazing-fast applications with zero configuration.';
+
+        try {
+            $post = Post::find(1);
+            if ($post) {
+                $postTitle = $post->title;
+                $postBody  = $post->body;
+            }
+        } catch (\Throwable) {
+            // Migrations not yet executed, fallback to starter greeting
+        }
 
         // Render view template
         $html = $this->view->render('home', [
             'postTitle' => $postTitle,
-            'postBody' => $postBody,
+            'postBody'  => $postBody,
         ]);
 
         return new Response($html, 200, ['Content-Type' => 'text/html; charset=UTF-8']);
