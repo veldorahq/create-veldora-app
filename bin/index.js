@@ -148,8 +148,8 @@ async function main() {
     const envExamplePath = path.join(projectPath, '.env.example');
     if (fs.existsSync(envExamplePath)) {
         let envContent = fs.readFileSync(envExamplePath, 'utf-8');
-        envContent = envContent.replace(/APP_NAME\s*=.*/g, `APP_NAME = "${projectName}"`);
-        envContent = envContent.replace(/APP_KEY\s*=.*/g, `APP_KEY = "${appKey}"`);
+        envContent = envContent.replace(/APP_NAME\s*=.*/g, `APP_NAME="${projectName}"`);
+        envContent = envContent.replace(/APP_KEY\s*=.*/g, `APP_KEY="${appKey}"`);
         fs.writeFileSync(envPath, envContent, 'utf-8');
     }
 
