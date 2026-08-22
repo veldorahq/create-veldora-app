@@ -1,0 +1,64 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/*
+|--------------------------------------------------------------------------
+| Veldora CLI Entry Point
+|--------------------------------------------------------------------------
+|
+| This is the Veldora console application entry point.
+| Run commands like: php veldora make:auth
+|
+*/
+
+// Find the autoloader from the project using this CLI
+$appBase = getcwd();
+
+// Try local vendor first (when running from a Veldora app)
+$autoloaders = [
+    $appBase . '/vendor/autoload.php',
+    __DIR__ . '/../vendor/autoload.php',
+    __DIR__ . '/../../autoload.php',
+];
+
+$loaded = false;
+foreach ($autoloaders as $autoloader) {
+    if (file_exists($autoloader)) {
+        require $autoloader;
+        $loaded = true;
+        break;
+    }
+}
+
+if (!$loaded) {
+    fwrite(STDERR, "Could not find autoloader. Run 'composer install' first.\n");
+    exit(1);
+}
+
+// Boot application if bootstrap exists
+$bootstrapPath = $appBase . '/bootstrap/app.php';
+if (file_exists($bootstrapPath)) {
+    $app = require $bootstrapPath;
+} else {
+    $app = new Veldora\Framework\Foundation\Application($appBase);
+}
+
+// Build Symfony Console application
+$console = new Symfony\Component\Console\Application('Veldora', '1.0.0');
+
+// Register built-in commands
+$console->add(new Veldora\Framework\Console\Commands\MigrateCommand());
+$console->add(new Veldora\Framework\Console\Commands\FreshCommand());
+$console->add(new Veldora\Framework\Console\Commands\RollbackCommand());
+$console->add(new Veldora\Framework\Console\Commands\MakeAuthCommand());
+$console->add(new Veldora\Framework\Console\Commands\MakeMigrationCommand());
+$console->add(new Veldora\Framework\Console\Commands\MakeModelCommand());
+$console->add(new Veldora\Framework\Console\Commands\MakeControllerCommand());
+
+// Phase 4 — UI Component System
+$console->add(new Veldora\Framework\Console\Commands\AddComponentCommand($appBase));
+$console->add(new Veldora\Framework\Console\Commands\ListComponentsCommand($appBase));
+
+$console->run();

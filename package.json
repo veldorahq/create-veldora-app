@@ -1,0 +1,45 @@
+{
+  "name": "create-veldora-app",
+  "version": "0.4.0-beta.1",
+  "type": "module",
+  "description": "Scaffold modern Veldora PHP applications in seconds with zero configuration.",
+  "publishConfig": {
+    "access": "public"
+  },
+  "bin": {
+    "create-veldora-app": "./bin/index.js",
+    "create-veldora": "./bin/index.js",
+    "veldora": "./bin/index.js"
+  },
+  "main": "./bin/index.js",
+  "keywords": [
+    "veldora",
+    "php",
+    "framework",
+    "scaffold",
+    "cli",
+    "create-veldora-app",
+    "blade",
+    "starter",
+    "nextjs-for-php"
+  ],
+  "author": "Shahriyar Fahim",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/veldorahq/create-veldora-app.git"
+  },
+  "bugs": {
+    "url": "https://github.com/veldorahq/create-veldora-app/issues"
+  },
+  "homepage": "https://veldora.dev",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "bin",
+    "template",
+    "README.md",
+    "LICENSE"
+  ]
+}
