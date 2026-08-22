@@ -15,7 +15,7 @@ declare(strict_types=1);
 
 $basePath = dirname(__DIR__);
 
-// 1. If Composer vendor autoload exists, load it
+// 1. If Composer vendor autoload exists, load it first
 $vendorAutoload = $basePath . '/vendor/autoload.php';
 if (file_exists($vendorAutoload)) {
     require_once $vendorAutoload;
@@ -50,3 +50,7 @@ $helpersFile = $basePath . '/src/Framework/helpers.php';
 if (file_exists($helpersFile)) {
     require_once $helpersFile;
 }
+
+// 4. Register the global exception / error / fatal-shutdown handler
+//    This must happen here so that even fatal errors in app/routes are caught
+\Veldora\Framework\Foundation\Exception\Handler::register();
