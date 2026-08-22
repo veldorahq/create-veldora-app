@@ -175,10 +175,10 @@
     </p>
 
     <div class="hero-actions">
-        <a href="https://veldora.dev/docs" target="_blank" rel="noopener" class="vui-btn vui-btn-primary vui-btn-lg btn-glow">
+        <a href="https://veldora.modrao.com/docs" target="_blank" rel="noopener" class="vui-btn vui-btn-primary vui-btn-lg btn-glow">
             Explore Documentation →
         </a>
-        <a href="https://veldora.dev/components" target="_blank" rel="noopener" class="vui-btn vui-btn-secondary vui-btn-lg">
+        <a href="https://veldora.modrao.com/components" target="_blank" rel="noopener" class="vui-btn vui-btn-secondary vui-btn-lg">
             Browse 21 UI Components
         </a>
     </div>
@@ -246,7 +246,7 @@
 <section class="grid-section">
     <div class="section-header">
         <h2 class="section-title">Veldora UI Components in Action</h2>
-        <a href="https://veldora.dev/components" target="_blank" rel="noopener" style="font-size: 0.85rem; color: #a78bfa; text-decoration: none; font-weight: 500;">
+        <a href="https://veldora.modrao.com/components" target="_blank" rel="noopener" style="font-size: 0.85rem; color: #a78bfa; text-decoration: none; font-weight: 500;">
             View all 21 components →
         </a>
     </div>

@@ -133,7 +133,7 @@ async function main() {
         console.log(`    ${dim}2.${reset} ${cyan}cd my-app${reset}`);
         console.log(`    ${dim}3.${reset} ${cyan}php veldora serve${reset}`);
         console.log();
-        console.log(`  ${dim}Documentation: https://veldora.dev • Author: Shahriyar Fahim${reset}\n`);
+        console.log(`  ${dim}Documentation: https://veldora.modrao.com • Author: Shahriyar Fahim${reset}\n`);
         process.exit(0);
     }
 
@@ -264,7 +264,7 @@ async function main() {
     }
     console.log(`    ${purple}php veldora serve${reset}`);
     console.log();
-    console.log(`  ${dim}Documentation: https://veldora.dev • Author: Shahriyar Fahim${reset}\n`);
+    console.log(`  ${dim}Documentation: https://veldora.modrao.com • Author: Shahriyar Fahim${reset}\n`);
 }
 
 main().catch(err => {

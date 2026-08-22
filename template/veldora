@@ -48,6 +48,52 @@ if (file_exists($bootstrapPath)) {
 $args = array_slice($argv, 1);
 $command = $args[0] ?? 'help';
 
+/**
+ * Format and colorize PHP built-in server request logs.
+ */
+function colorizeServerLog(string $line): ?string
+{
+    $line = trim($line);
+    if ($line === '') {
+        return null;
+    }
+
+    // Ignore internal noisy connection messages
+    if (str_contains($line, 'Accepted') || str_contains($line, 'Closing') || str_contains($line, 'Development Server') || str_contains($line, 'started')) {
+        return null;
+    }
+
+    // Pattern: [timestamp] IP [statusCode]: METHOD /uri
+    if (preg_match('/\[(.*?)\] (?:[\d\.:]+) \[(\d{3})\]: ([A-Z]+) (.*)/', $line, $m)) {
+        $timeStr = date('h:i:s A', strtotime($m[1]) ?: time());
+        $status = (int) $m[2];
+        $method = $m[3];
+        $uri = $m[4];
+
+        if ($status >= 200 && $status < 300) {
+            $statusStr = "\033[32m\033[1m" . $status . " OK\033[0m";
+        } elseif ($status >= 300 && $status < 400) {
+            $statusStr = "\033[36m" . $status . "\033[0m";
+        } elseif ($status >= 400 && $status < 500) {
+            $statusStr = "\033[33m" . $status . " Not Found\033[0m";
+        } else {
+            $statusStr = "\033[31m\033[1m" . $status . " Error\033[0m";
+        }
+
+        $methodStr = "\033[35m\033[1m" . str_pad($method, 6) . "\033[0m";
+        $uriStr = ($status === 404) ? ("\033[90m" . $uri . "\033[0m") : ("\033[97m" . $uri . "\033[0m");
+
+        return "  \033[90m" . $timeStr . "\033[0m  " . $statusStr . "  " . $methodStr . " " . $uriStr;
+    }
+
+    // Error / Exception logs
+    if (str_contains($line, 'error') || str_contains($line, 'Fatal') || str_contains($line, 'Exception') || str_contains($line, 'Stack trace:')) {
+        return "  \033[31m\033[1m✖\033[0m \033[31m" . $line . "\033[0m";
+    }
+
+    return "  \033[90m" . $line . "\033[0m";
+}
+
 // ── Built-in CLI Runner (Zero external dependencies needed) ─────────────────
 switch ($command) {
     case 'serve':
@@ -62,10 +108,32 @@ switch ($command) {
                 $host = substr($arg, 7);
             }
         }
-        echo "\n\033[35m\033[1m  ▲ Veldora Development Server\033[0m\n";
-        echo "\033[90m  Server running on:\033[0m \033[36m\033[1mhttp://{$host}:{$port}\033[0m\n";
-        echo "\033[90m  Press Ctrl+C to stop the server.\033[0m\n\n";
-        passthru(PHP_BINARY . " -S {$host}:{$port} -t public/");
+        echo "\n\033[35m\033[1m  ▲ Veldora Development Server\033[0m \033[90mv0.4.0\033[0m\n\n";
+        echo "  \033[90mServer running on:\033[0m   \033[36m\033[1mhttp://{$host}:{$port}\033[0m\n";
+        echo "  \033[90mEnvironment:\033[0m         \033[32mlocal\033[0m\n";
+        echo "  \033[90mPress \033[33m\033[1mCtrl+C\033[0m\033[90m to stop the server.\033[0m\n\n";
+        echo "  \033[90m──────────────────────────────────────────────────────────\033[0m\n\n";
+
+        $descriptors = [
+            0 => STDIN,
+            1 => STDOUT,
+            2 => ['pipe', 'w'],
+        ];
+        $cmd = PHP_BINARY . " -S {$host}:{$port} -t public/";
+        $process = proc_open($cmd, $descriptors, $pipes);
+        if (is_resource($process)) {
+            while (!feof($pipes[2])) {
+                $line = fgets($pipes[2]);
+                if ($line !== false) {
+                    $formatted = colorizeServerLog($line);
+                    if ($formatted !== null) {
+                        echo $formatted . "\n";
+                    }
+                }
+            }
+            fclose($pipes[2]);
+            proc_close($process);
+        }
         exit(0);
 
     case 'make:controller':
@@ -138,7 +206,7 @@ switch ($command) {
         echo "    \033[33mmigrate:fresh\033[0m     \033[90mDrop all tables and re-run all migrations\033[0m\n";
         echo "    \033[32mui:list\033[0m           \033[90mList all 21 available Veldora UI components\033[0m\n";
         echo "    \033[32madd [components]\033[0m  \033[90mAdd UI components into resources/views/components/\033[0m\n\n";
-        echo "  \033[90mDocumentation: https://veldora.dev • Author: Shahriyar Fahim\033[0m\n\n";
+        echo "  \033[90mDocumentation: https://veldora.modrao.com • Author: Shahriyar Fahim\033[0m\n\n";
         exit(0);
 }
 
@@ -160,6 +228,5 @@ if (class_exists(Symfony\Component\Console\Application::class)) {
 
 // Fallback direct execution if Symfony console is not yet installed
 if (isset($cmd)) {
-    // If Symfony console classes aren't present, execute action directly
     echo "\033[32m✔ Executing {$command}...\033[0m\n";
 }
