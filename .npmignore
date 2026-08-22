@@ -1,0 +1,7 @@
+.git
+.gitignore
+.DS_Store
+Thumbs.db
+node_modules
+template/vendor
+template/database/*.sqlite-journal
