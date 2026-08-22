@@ -89,6 +89,25 @@ async function main() {
     console.log();
 
     const args = process.argv.slice(2);
+
+    if (args.includes('--help') || args.includes('-h')) {
+        console.log(`  ${bold}Usage:${reset}`);
+        console.log(`    $ npx create-veldora-app [project-name]`);
+        console.log(`    $ veldora [project-name]`);
+        console.log();
+        console.log(`  ${bold}Options:${reset}`);
+        console.log(`    -h, --help       Display this help message`);
+        console.log(`    -v, --version    Display version number`);
+        console.log();
+        console.log(`  ${dim}Author: Shahriyar Fahim • https://veldora.dev${reset}\n`);
+        process.exit(0);
+    }
+
+    if (args.includes('--version') || args.includes('-v')) {
+        console.log(`v0.4.0-beta.1\n`);
+        process.exit(0);
+    }
+
     let targetDir = args[0];
 
     if (!targetDir) {

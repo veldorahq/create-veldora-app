@@ -1,15 +1,15 @@
 {
   "name": "create-veldora-app",
-  "version": "0.4.0-beta.1",
+  "version": "0.4.0-beta.2",
   "type": "module",
   "description": "Scaffold modern Veldora PHP applications in seconds with zero configuration.",
   "publishConfig": {
     "access": "public"
   },
   "bin": {
-    "create-veldora-app": "./bin/index.js",
-    "create-veldora": "./bin/index.js",
-    "veldora": "./bin/index.js"
+    "create-veldora-app": "bin/index.js",
+    "create-veldora": "bin/index.js",
+    "veldora": "bin/index.js"
   },
   "main": "./bin/index.js",
   "keywords": [
@@ -27,7 +27,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/veldorahq/create-veldora-app.git"
+    "url": "git+https://github.com/veldorahq/create-veldora-app.git"
   },
   "bugs": {
     "url": "https://github.com/veldorahq/create-veldora-app/issues"
