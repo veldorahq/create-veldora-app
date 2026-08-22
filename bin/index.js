@@ -101,21 +101,38 @@ async function main() {
         firstArg === '--help'
     ) {
         console.log(`  ${bold}Usage:${reset}`);
-        console.log(`    $ npx create-veldora-app [project-name]`);
         console.log(`    $ veldora [project-name]`);
         console.log(`    $ veldora new [project-name]`);
-        console.log(`    $ veldora create [project-name]`);
+        console.log(`    $ npx create-veldora-app [project-name]`);
         console.log();
-        console.log(`  ${bold}Commands:${reset}`);
-        console.log(`    ${cyan}new, create${reset}     Scaffold a new Veldora application`);
-        console.log(`    ${cyan}help${reset}            Display this help message`);
-        console.log(`    ${cyan}version${reset}         Display version number`);
+        console.log(`  ${bold}Project Creation Commands:${reset}`);
+        console.log(`    ${cyan}veldora [name]${reset}              Create a new Veldora application`);
+        console.log(`    ${cyan}veldora new [name]${reset}          Create a new Veldora application`);
+        console.log(`    ${cyan}veldora help${reset}                Show this comprehensive help guide`);
+        console.log(`    ${cyan}veldora version${reset}             Display installed version`);
         console.log();
-        console.log(`  ${bold}Options:${reset}`);
-        console.log(`    -h, --help       Display this help message`);
-        console.log(`    -v, --version    Display version number`);
+        console.log(`  ${bold}Framework Commands (Inside your project):${reset}`);
+        console.log(`    ${purple}php veldora serve${reset}           Start the local development server (http://localhost:8000)`);
+        console.log(`    ${purple}php veldora make:controller${reset}  Scaffold a new HTTP Controller (e.g. php veldora make:controller PostController)`);
+        console.log(`    ${purple}php veldora make:model${reset}       Scaffold an ActiveRecord Model (e.g. php veldora make:model Post)`);
+        console.log(`    ${purple}php veldora make:migration${reset}   Create a database migration file (e.g. php veldora make:migration create_posts_table)`);
+        console.log(`    ${purple}php veldora make:auth${reset}        Scaffold full authentication (Login, Register, Dashboard)`);
         console.log();
-        console.log(`  ${dim}Author: Shahriyar Fahim • https://veldora.dev${reset}\n`);
+        console.log(`  ${bold}Database & Migrations:${reset}`);
+        console.log(`    ${yellow}php veldora migrate${reset}         Run all pending database migrations`);
+        console.log(`    ${yellow}php veldora migrate:rollback${reset}Rollback the last migration batch`);
+        console.log(`    ${yellow}php veldora migrate:fresh${reset}   Drop all tables and re-run all migrations`);
+        console.log();
+        console.log(`  ${bold}UI Component System (21 UI Components):${reset}`);
+        console.log(`    ${green}php veldora ui:list${reset}         List all 21 available UI components`);
+        console.log(`    ${green}php veldora add [components]${reset}Add components to views/components (e.g. php veldora add button modal card tabs)`);
+        console.log();
+        console.log(`  ${bold}Quick Start Workflow:${reset}`);
+        console.log(`    ${dim}1.${reset} veldora my-app`);
+        console.log(`    ${dim}2.${reset} cd my-app`);
+        console.log(`    ${dim}3.${reset} php veldora serve`);
+        console.log();
+        console.log(`  ${dim}Documentation: https://veldora.dev • Author: Shahriyar Fahim${reset}\n`);
         process.exit(0);
     }
 
@@ -127,7 +144,7 @@ async function main() {
         firstArg === '-v' ||
         firstArg === '--version'
     ) {
-        console.log(`  v0.4.0-beta.4\n`);
+        console.log(`  v0.4.0-beta.5\n`);
         process.exit(0);
     }
 
