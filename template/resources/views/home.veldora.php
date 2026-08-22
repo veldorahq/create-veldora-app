@@ -2,291 +2,267 @@
 
 @section('content')
 <style>
-    /* ── Hero Section ─────────────────────────────────── */
-    .hero {
+    /* ── Hero ────────────────────────────────────────────── */
+    .welcome-hero {
         text-align: center;
-        max-width: 800px;
-        margin: 0 auto 4rem;
+        max-width: 640px;
+        margin: 1.5rem auto 3.5rem;
     }
 
-    .hero-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 5px 14px;
-        border-radius: 999px;
-        background: rgba(139, 92, 246, 0.08);
-        border: 1px solid rgba(139, 92, 246, 0.25);
-        color: #c4b5fd;
-        font-size: 0.8rem;
-        font-weight: 600;
+    .hero-icon {
+        width: 48px;
+        height: 48px;
+        fill: var(--accent);
         margin-bottom: 1.5rem;
+        filter: drop-shadow(0 0 16px rgba(139, 92, 246, 0.4));
     }
 
-    .hero-badge span {
-        color: #a78bfa;
+    .welcome-title {
+        font-size: 2.25rem;
+        font-weight: 700;
+        letter-spacing: -0.025em;
+        margin-bottom: 0.75rem;
+        color: #ffffff;
     }
 
-    .hero-title {
-        font-family: 'Outfit', sans-serif;
-        font-size: 3rem;
-        line-height: 1.15;
-        font-weight: 800;
-        letter-spacing: -0.03em;
-        margin-bottom: 1.25rem;
-        background: linear-gradient(180deg, #ffffff 60%, #a1a1aa 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-
-    .hero-desc {
-        font-size: 1.1rem;
+    .welcome-subtitle {
+        font-size: 1.05rem;
         color: var(--text-muted);
         line-height: 1.6;
-        margin-bottom: 2rem;
     }
 
-    .hero-actions {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 14px;
-        flex-wrap: wrap;
-    }
-
-    .btn-glow {
-        box-shadow: 0 0 24px rgba(139, 92, 246, 0.35);
-    }
-
-    /* ── Quick Start Grid ─────────────────────────────── */
-    .grid-section {
-        margin-bottom: 4rem;
-    }
-
-    .section-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 1.5rem;
-        border-bottom: 1px solid var(--border-subtle);
-        padding-bottom: 0.75rem;
-    }
-
-    .section-title {
-        font-family: 'Outfit', sans-serif;
-        font-size: 1.25rem;
-        font-weight: 700;
-        letter-spacing: -0.02em;
-    }
-
-    .cards-grid {
+    /* ── Cards Grid ──────────────────────────────────────── */
+    .features-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        grid-template-columns: repeat(2, 1fr);
         gap: 1.25rem;
+        max-width: 960px;
+        margin: 0 auto;
     }
 
-    .step-card {
-        background: #121215;
-        border: 1px solid var(--border-subtle);
-        border-radius: 10px;
+    .feature-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
         padding: 1.5rem;
-        transition: transform 0.2s ease, border-color 0.2s ease;
+        transition: border-color 0.2s, background 0.2s;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
     }
 
-    .step-card:hover {
-        transform: translateY(-2px);
-        border-color: #3f3f46;
+    .feature-card:hover {
+        border-color: var(--border-hover);
+        background: var(--surface-hover);
     }
 
-    .step-num {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.75rem;
-        font-weight: 700;
-        color: #a78bfa;
-        margin-bottom: 0.75rem;
-    }
-
-    .step-title {
-        font-size: 1rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        color: #fff;
-    }
-
-    .step-desc {
-        font-size: 0.85rem;
-        color: var(--text-muted);
+    .feature-top {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
         margin-bottom: 1.25rem;
+    }
+
+    .feature-icon-box {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: rgba(139, 92, 246, 0.1);
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .feature-title {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 0.25rem;
+    }
+
+    .feature-desc {
+        font-size: 0.875rem;
+        color: var(--text-muted);
         line-height: 1.5;
     }
 
-    .code-pill {
-        background: #09090b;
-        border: 1px solid #27272a;
+    .feature-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--accent);
+        text-decoration: none;
+        transition: gap 0.15s ease;
+    }
+
+    .feature-link:hover {
+        gap: 9px;
+        color: #a78bfa;
+    }
+
+    /* ── Snippet Box ─────────────────────────────────────── */
+    .snippet-box {
+        background: #060608;
+        border: 1px solid var(--border);
+        border-radius: 8px;
         padding: 8px 12px;
-        border-radius: 6px;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.78rem;
-        color: #38bdf8;
         display: flex;
         align-items: center;
         justify-content: space-between;
+        gap: 10px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.8rem;
+        overflow: hidden;
     }
 
-    /* ── Live UI Component Showcase ───────────────────── */
-    .showcase-card {
-        background: #121215;
-        border: 1px solid var(--border-subtle);
-        border-radius: 12px;
-        padding: 2rem;
+    .snippet-text {
+        color: #38bdf8;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
-    .showcase-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 2rem;
+    .copy-btn {
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.15s, background 0.15s;
+        flex-shrink: 0;
     }
 
+    .copy-btn:hover {
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    /* ── Responsive ──────────────────────────────────────── */
     @media (max-width: 768px) {
-        .hero-title {
-            font-size: 2.25rem;
-        }
-        .showcase-grid {
+        .features-grid {
             grid-template-columns: 1fr;
+        }
+        .welcome-title {
+            font-size: 1.85rem;
         }
     }
 </style>
 
-<!-- Hero Section -->
-<section class="hero">
-    <div class="hero-badge">
-        <span>✦</span> The Modern PHP Framework You Actually Own
-    </div>
-    
-    <h1 class="hero-title">
-        A blazing-fast foundation for your next big idea.
-    </h1>
-
-    <p class="hero-desc">
-        Zero-configuration setup with native Blade components, built-in ActiveRecord models, dynamic routing, and 21 monochrome UI components.
+<!-- Hero -->
+<div class="welcome-hero">
+    <svg class="hero-icon" viewBox="0 0 24 24">
+        <polygon points="12,2 22,20 2,20"></polygon>
+    </svg>
+    <h1 class="welcome-title">Welcome to your application</h1>
+    <p class="welcome-subtitle">
+        Veldora gives you a clean, lightweight foundation to build modern web applications in PHP.
     </p>
+</div>
 
-    <div class="hero-actions">
-        <a href="https://veldora.modrao.com/docs" target="_blank" rel="noopener" class="vui-btn vui-btn-primary vui-btn-lg btn-glow">
-            Explore Documentation →
-        </a>
-        <a href="https://veldora.modrao.com/components" target="_blank" rel="noopener" class="vui-btn vui-btn-secondary vui-btn-lg">
-            Browse 21 UI Components
-        </a>
-    </div>
-</section>
+<!-- Features & Commands Grid -->
+<div class="features-grid">
 
-<!-- Quick Start Grid -->
-<section class="grid-section">
-    <div class="section-header">
-        <h2 class="section-title">Quick Start Guide</h2>
-        <span style="font-size: 0.8rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">Ready in 5 seconds</span>
-    </div>
-
-    <div class="cards-grid">
-        <!-- Card 1 -->
-        <div class="step-card">
-            <div>
-                <div class="step-num">STEP 01</div>
-                <h3 class="step-title">Development Server</h3>
-                <p class="step-desc">Start the built-in HTTP dev server with hot templates and instant reload.</p>
+    <!-- Card 1: Documentation -->
+    <div class="feature-card">
+        <div class="feature-top">
+            <div class="feature-icon-box">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                </svg>
             </div>
-            <div class="code-pill">
-                <span>php veldora serve</span>
+            <div>
+                <h3 class="feature-title">Documentation</h3>
+                <p class="feature-desc">Explore comprehensive guides on routing, controllers, middleware, and ActiveRecord models.</p>
             </div>
         </div>
-
-        <!-- Card 2 -->
-        <div class="step-card">
-            <div>
-                <div class="step-num">STEP 02</div>
-                <h3 class="step-title">Generate Controllers</h3>
-                <p class="step-desc">Scaffold clean HTTP controllers with action methods and request handling.</p>
-            </div>
-            <div class="code-pill">
-                <span>php veldora make:controller PostController</span>
-            </div>
-        </div>
-
-        <!-- Card 3 -->
-        <div class="step-card">
-            <div>
-                <div class="step-num">STEP 03</div>
-                <h3 class="step-title">Add UI Components</h3>
-                <p class="step-desc">Copy accessible, pre-styled components directly into your views directory.</p>
-            </div>
-            <div class="code-pill">
-                <span>php veldora add button card modal</span>
-            </div>
-        </div>
-
-        <!-- Card 4 -->
-        <div class="step-card">
-            <div>
-                <div class="step-num">STEP 04</div>
-                <h3 class="step-title">Database & Auth</h3>
-                <p class="step-desc">Run migrations or scaffold a complete authentication system in one command.</p>
-            </div>
-            <div class="code-pill">
-                <span>php veldora make:auth</span>
-            </div>
+        <div>
+            <a href="https://veldora.modrao.com/docs" target="_blank" rel="noopener" class="feature-link">
+                Read documentation <span>→</span>
+            </a>
         </div>
     </div>
-</section>
 
-<!-- Live UI Preview Section -->
-<section class="grid-section">
-    <div class="section-header">
-        <h2 class="section-title">Veldora UI Components in Action</h2>
-        <a href="https://veldora.modrao.com/components" target="_blank" rel="noopener" style="font-size: 0.85rem; color: #a78bfa; text-decoration: none; font-weight: 500;">
-            View all 21 components →
-        </a>
-    </div>
-
-    <div class="showcase-card">
-        <div class="showcase-grid">
-            <!-- Demo 1 -->
-            <div>
-                <h4 style="font-size: 0.9rem; font-weight: 600; color: #fff; margin-bottom: 0.5rem;">Alert & Badge Components</h4>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Accessible notification banners and status badges.</p>
-
-                <x-alert type="success" title="Application Ready">
-                    Your Veldora application environment is properly configured.
-                </x-alert>
-
-                <div style="margin-top: 1rem; display: flex; gap: 8px; flex-wrap: wrap;">
-                    <x-badge variant="primary">PHP 8.2+</x-badge>
-                    <x-badge variant="secondary">Zero Config</x-badge>
-                    <x-badge variant="outline">21 Components</x-badge>
-                    <x-badge variant="success">ActiveRecord</x-badge>
-                </div>
+    <!-- Card 2: UI Components -->
+    <div class="feature-card">
+        <div class="feature-top">
+            <div class="feature-icon-box">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="3" y1="9" x2="21" y2="9"></line>
+                    <line x1="9" y1="21" x2="9" y2="9"></line>
+                </svg>
             </div>
-
-            <!-- Demo 2 -->
             <div>
-                <h4 style="font-size: 0.9rem; font-weight: 600; color: #fff; margin-bottom: 0.5rem;">Card & Action Buttons</h4>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Pre-styled dark-mode interactive cards.</p>
-
-                <x-card :title="$postTitle" subtitle="Rendered dynamically from Controller">
-                    <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1rem;">
-                        {{ $postBody }}
-                    </p>
-                    <div style="display: flex; gap: 10px;">
-                        <x-button variant="primary" size="sm">Primary Action</x-button>
-                        <x-button variant="secondary" size="sm">Secondary</x-button>
-                    </div>
-                </x-card>
+                <h3 class="feature-title">UI Components</h3>
+                <p class="feature-desc">Browse 21 production-ready, accessible Blade components you can copy directly into your project.</p>
             </div>
         </div>
+        <div>
+            <a href="https://veldora.modrao.com/components" target="_blank" rel="noopener" class="feature-link">
+                Browse components <span>→</span>
+            </a>
+        </div>
     </div>
-</section>
+
+    <!-- Card 3: Dev Server -->
+    <div class="feature-card">
+        <div class="feature-top">
+            <div class="feature-icon-box">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+            </div>
+            <div>
+                <h3 class="feature-title">Development Server</h3>
+                <p class="feature-desc">Start your local server with instant reloading and colorized request logs.</p>
+            </div>
+        </div>
+        <div class="snippet-box">
+            <span class="snippet-text">php veldora serve</span>
+            <button class="copy-btn" onclick="copyCode('php veldora serve', this)" title="Copy to clipboard">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Card 4: Code Generators -->
+    <div class="feature-card">
+        <div class="feature-top">
+            <div class="feature-icon-box">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="16 18 22 12 16 6"></polyline>
+                    <polyline points="8 6 2 12 8 18"></polyline>
+                </svg>
+            </div>
+            <div>
+                <h3 class="feature-title">CLI Generators</h3>
+                <p class="feature-desc">Scaffold controllers, models, migrations, and authentication in seconds.</p>
+            </div>
+        </div>
+        <div class="snippet-box">
+            <span class="snippet-text">php veldora make:controller PostController</span>
+            <button class="copy-btn" onclick="copyCode('php veldora make:controller PostController', this)" title="Copy to clipboard">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+</div>
 
 @endsection

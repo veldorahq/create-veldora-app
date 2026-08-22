@@ -1,27 +1,28 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $title ?? env('APP_NAME', 'Veldora') . ' — The Modern PHP Framework' }}</title>
+    <title>{{ $title ?? 'Veldora' }}</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-    <!-- Veldora UI Styles -->
+    <!-- Styles -->
     <link rel="stylesheet" href="/css/veldora-ui.css">
 
     <style>
         :root {
-            --bg-base: #09090b;
-            --bg-surface: #121215;
-            --border-subtle: #27272a;
-            --text-main: #f4f4f5;
-            --text-muted: #a1a1aa;
+            --bg: #0a0a0c;
+            --surface: #111114;
+            --surface-hover: #17171c;
+            --border: #222228;
+            --border-hover: #33333f;
+            --text: #f0f0f3;
+            --text-muted: #8c8c9a;
             --accent: #8b5cf6;
-            --accent-glow: rgba(139, 92, 246, 0.15);
         }
 
         * {
@@ -31,192 +32,152 @@
         }
 
         body {
-            background-color: var(--bg-base);
-            color: var(--text-main);
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            line-height: 1.6;
+            line-height: 1.5;
             -webkit-font-smoothing: antialiased;
-            background-image: 
-                radial-gradient(ellipse 80% 50% at 50% -20%, var(--accent-glow), transparent),
-                radial-gradient(circle at 100% 100%, rgba(24, 24, 27, 0.5), transparent);
+            background-image: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.08) 0%, transparent 60%);
             background-repeat: no-repeat;
         }
 
-        /* ── Modern App Navbar ────────────────────────────────── */
-        .app-navbar {
+        /* ── Header ─────────────────────────────────────────── */
+        .site-header {
+            width: 100%;
+            border-bottom: 1px solid var(--border);
+            background: rgba(10, 10, 12, 0.8);
+            backdrop-filter: blur(12px);
             position: sticky;
             top: 0;
-            z-index: 50;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            background: rgba(9, 9, 11, 0.75);
-            border-bottom: 1px solid var(--border-subtle);
+            z-index: 40;
         }
 
-        .navbar-inner {
-            max-width: 1200px;
+        .header-container {
+            max-width: 1080px;
             margin: 0 auto;
-            padding: 0.85rem 1.5rem;
+            padding: 1rem 1.5rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
 
-        .brand {
+        .brand-link {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             text-decoration: none;
             color: #fff;
+            font-weight: 700;
+            font-size: 1.05rem;
+            letter-spacing: -0.01em;
         }
 
-        .brand-logo {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.15rem;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            background: linear-gradient(135deg, #ffffff 40%, #a78bfa 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .brand-icon {
+            width: 22px;
+            height: 22px;
+            fill: var(--accent);
+        }
+
+        .header-nav {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 20px;
         }
 
-        .brand-logo svg {
-            width: 20px;
-            height: 20px;
-            fill: #8b5cf6;
-        }
-
-        .version-badge {
-            font-size: 0.7rem;
-            font-family: 'JetBrains Mono', monospace;
-            padding: 2px 8px;
-            border-radius: 999px;
-            background: rgba(139, 92, 246, 0.12);
-            color: #a78bfa;
-            border: 1px solid rgba(139, 92, 246, 0.25);
-            font-weight: 600;
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-        }
-
-        .nav-link {
-            font-size: 0.85rem;
+        .header-nav a {
             color: var(--text-muted);
             text-decoration: none;
+            font-size: 0.875rem;
             font-weight: 500;
             transition: color 0.15s ease;
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
 
-        .nav-link:hover {
+        .header-nav a:hover {
             color: #ffffff;
         }
 
-        .nav-btn {
-            font-size: 0.8rem;
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-weight: 600;
-            text-decoration: none;
-            background: #ffffff;
-            color: #09090b;
-            transition: opacity 0.15s ease;
+        .github-link {
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            padding: 4px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text) !important;
+            font-size: 0.8rem !important;
+            transition: border-color 0.15s, background 0.15s;
         }
 
-        .nav-btn:hover {
-            opacity: 0.9;
+        .github-link:hover {
+            border-color: var(--border-hover);
+            background: var(--surface-hover);
         }
 
-        /* ── Main Layout ──────────────────────────────────────── */
+        /* ── Main Content ───────────────────────────────────── */
         main {
             flex: 1;
-            max-width: 1200px;
+            max-width: 1080px;
             width: 100%;
             margin: 0 auto;
-            padding: 3.5rem 1.5rem 5rem;
+            padding: 3rem 1.5rem 4rem;
         }
 
-        /* ── Footer ───────────────────────────────────────────── */
-        .app-footer {
-            border-top: 1px solid var(--border-subtle);
-            padding: 2rem 1.5rem;
-            background: rgba(9, 9, 11, 0.6);
+        /* ── Footer ─────────────────────────────────────────── */
+        .site-footer {
+            border-top: 1px solid var(--border);
+            padding: 1.75rem 1.5rem;
+            background: rgba(10, 10, 12, 0.4);
         }
 
-        .footer-inner {
-            max-width: 1200px;
+        .footer-container {
+            max-width: 1080px;
             margin: 0 auto;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-size: 0.8rem;
+            font-size: 0.825rem;
             color: var(--text-muted);
             flex-wrap: wrap;
             gap: 12px;
         }
 
-        .footer-links {
-            display: flex;
-            gap: 16px;
-        }
-
-        .footer-links a {
-            color: var(--text-muted);
-            text-decoration: none;
-            transition: color 0.15s;
-        }
-
-        .footer-links a:hover {
-            color: #fff;
+        .footer-info {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
         }
 
         @media (max-width: 640px) {
-            .nav-links .hide-sm {
+            .header-nav .hide-mobile {
                 display: none;
             }
-            .footer-inner {
+            .footer-container {
                 flex-direction: column;
                 text-align: center;
-                justify-content: center;
+                gap: 8px;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- Header Navigation -->
-    <header class="app-navbar">
-        <div class="navbar-inner">
-            <a href="/" class="brand">
-                <span class="brand-logo">
-                    <svg viewBox="0 0 24 24">
-                        <polygon points="12,2 22,20 2,20"></polygon>
-                    </svg>
-                    {{ env('APP_NAME', 'Veldora') }}
-                </span>
-                <span class="version-badge">v0.4.0-beta</span>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="/" class="brand-link">
+                <svg class="brand-icon" viewBox="0 0 24 24">
+                    <polygon points="12,2 22,20 2,20"></polygon>
+                </svg>
+                <span>Veldora</span>
             </a>
 
-            <nav class="nav-links">
-                <a href="https://veldora.modrao.com/docs" target="_blank" rel="noopener" class="nav-link hide-sm">Documentation</a>
-                <a href="https://veldora.modrao.com/components" target="_blank" rel="noopener" class="nav-link hide-sm">Components</a>
-                <a href="https://github.com/veldorahq" target="_blank" rel="noopener" class="nav-btn">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+            <nav class="header-nav">
+                <a href="https://veldora.modrao.com/docs" target="_blank" rel="noopener" class="hide-mobile">Documentation</a>
+                <a href="https://veldora.modrao.com/components" target="_blank" rel="noopener" class="hide-mobile">Components</a>
+                <a href="https://github.com/veldorahq" target="_blank" rel="noopener" class="github-link">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
                     </svg>
                     GitHub
@@ -225,25 +186,31 @@
         </div>
     </header>
 
-    <!-- Main View Content -->
     <main>
         @yield('content')
     </main>
 
-    <!-- Footer -->
-    <footer class="app-footer">
-        <div class="footer-inner">
+    <footer class="site-footer">
+        <div class="footer-container">
             <div>
-                Crafted with love by <strong>Shahriyar Fahim</strong> • MIT Licensed
+                Crafted by <strong>Shahriyar Fahim</strong>
             </div>
-            <div class="footer-links">
-                <a href="https://veldora.modrao.com" target="_blank" rel="noopener">Official Website</a>
-                <a href="https://veldora.modrao.com/docs" target="_blank" rel="noopener">Docs</a>
-                <a href="https://veldora.modrao.com/components" target="_blank" rel="noopener">UI Components</a>
-                <a href="https://github.com/veldorahq" target="_blank" rel="noopener">GitHub</a>
+            <div class="footer-info">
+                Veldora v0.4.0 (PHP v<?= PHP_VERSION ?>)
             </div>
         </div>
     </footer>
 
+    <script>
+        function copyCode(text, btn) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalSvg = btn.innerHTML;
+                btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+                setTimeout(() => {
+                    btn.innerHTML = originalSvg;
+                }, 2000);
+            });
+        }
+    </script>
 </body>
 </html>
