@@ -89,11 +89,27 @@ async function main() {
     console.log();
 
     const args = process.argv.slice(2);
+    const firstArg = (args[0] || '').toLowerCase().trim();
 
-    if (args.includes('--help') || args.includes('-h')) {
+    // ── Help commands ────────────────────────────────────────────────────────
+    if (
+        args.includes('--help') ||
+        args.includes('-h') ||
+        firstArg === 'help' ||
+        firstArg === '?' ||
+        firstArg === '-h' ||
+        firstArg === '--help'
+    ) {
         console.log(`  ${bold}Usage:${reset}`);
         console.log(`    $ npx create-veldora-app [project-name]`);
         console.log(`    $ veldora [project-name]`);
+        console.log(`    $ veldora new [project-name]`);
+        console.log(`    $ veldora create [project-name]`);
+        console.log();
+        console.log(`  ${bold}Commands:${reset}`);
+        console.log(`    ${cyan}new, create${reset}     Scaffold a new Veldora application`);
+        console.log(`    ${cyan}help${reset}            Display this help message`);
+        console.log(`    ${cyan}version${reset}         Display version number`);
         console.log();
         console.log(`  ${bold}Options:${reset}`);
         console.log(`    -h, --help       Display this help message`);
@@ -103,12 +119,26 @@ async function main() {
         process.exit(0);
     }
 
-    if (args.includes('--version') || args.includes('-v')) {
-        console.log(`v0.4.0-beta.1\n`);
+    // ── Version commands ─────────────────────────────────────────────────────
+    if (
+        args.includes('--version') ||
+        args.includes('-v') ||
+        firstArg === 'version' ||
+        firstArg === '-v' ||
+        firstArg === '--version'
+    ) {
+        console.log(`  v0.4.0-beta.4\n`);
         process.exit(0);
     }
 
-    let targetDir = args[0];
+    // ── Determine project directory / name ───────────────────────────────────
+    let targetDir = '';
+
+    if (firstArg === 'new' || firstArg === 'create' || firstArg === 'init') {
+        targetDir = args[1] || '';
+    } else {
+        targetDir = args[0] || '';
+    }
 
     if (!targetDir) {
         targetDir = await ask('What is your project named?', 'my-veldora-app');
