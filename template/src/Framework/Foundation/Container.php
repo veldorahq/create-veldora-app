@@ -130,6 +130,22 @@ class Container implements ContainerInterface
     }
 
     /**
+     * Determine if the given abstract type has been bound.
+     */
+    public function bound(string $id): bool
+    {
+        return isset($this->bindings[$id]) || isset($this->instances[$id]);
+    }
+
+    /**
+     * Determine if the given abstract type has been bound (alias).
+     */
+    public function isBound(string $id): bool
+    {
+        return $this->bound($id);
+    }
+
+    /**
      * Resolve a class using reflection autowiring.
      */
     public function resolve(string $class): mixed

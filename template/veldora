@@ -540,6 +540,7 @@ if (class_exists(Symfony\Component\Console\Application::class)) {
     $console->add(new Veldora\Framework\Console\Commands\MakeMiddlewareCommand());
     $console->add(new Veldora\Framework\Console\Commands\MakeRequestCommand());
     $console->add(new Veldora\Framework\Console\Commands\MakeResourceCommand());
+    $console->add(new Veldora\Framework\Console\Commands\MakeFactoryCommand());
     $console->add(new Veldora\Framework\Console\Commands\MakeSeederCommand());
     $console->add(new Veldora\Framework\Console\Commands\MigrateCommand());
     $console->add(new Veldora\Framework\Console\Commands\FreshCommand());

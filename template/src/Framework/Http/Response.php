@@ -48,6 +48,16 @@ class Response
     }
 
     /**
+     * Get all response headers.
+     *
+     * @return array<string, string>
+     */
+    public function getHeaders(): array
+    {
+        return $this->headers;
+    }
+
+    /**
      * Set the status code.
      */
     public function setStatusCode(int $statusCode): self
