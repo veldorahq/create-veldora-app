@@ -13,10 +13,10 @@ class AddComponentCommand extends Command
 
     private string $projectRoot;
 
-    public function __construct(string $projectRoot)
+    public function __construct(?string $projectRoot = null)
     {
         parent::__construct();
-        $this->projectRoot = $projectRoot;
+        $this->projectRoot = $projectRoot ?? getcwd();
     }
 
     protected function configure(): void
@@ -102,9 +102,15 @@ class AddComponentCommand extends Command
      */
     private function buildRegistry(): array
     {
+        if (class_exists(\Veldora\UI\Registry\ComponentRegistry::class)) {
+            $reg = new \Veldora\UI\Registry\ComponentRegistry();
+            return $reg->all();
+        }
+
         // Resolve veldora-ui package path
         $paths = [
             $this->projectRoot . '/vendor/veldora/ui/src/Registry/ComponentRegistry.php',
+            dirname($this->projectRoot) . '/veldora-ui/src/Registry/ComponentRegistry.php',
             __DIR__ . '/../../../../veldora-ui/src/Registry/ComponentRegistry.php',
             __DIR__ . '/../../../../../veldora-ui/src/Registry/ComponentRegistry.php',
         ];
@@ -112,8 +118,10 @@ class AddComponentCommand extends Command
         foreach ($paths as $path) {
             if (file_exists($path)) {
                 require_once $path;
-                $reg = new \Veldora\UI\Registry\ComponentRegistry();
-                return $reg->all();
+                if (class_exists(\Veldora\UI\Registry\ComponentRegistry::class)) {
+                    $reg = new \Veldora\UI\Registry\ComponentRegistry();
+                    return $reg->all();
+                }
             }
         }
 

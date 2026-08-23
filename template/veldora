@@ -281,10 +281,12 @@ switch ($command) {
             fwrite(STDERR, "\033[31mError:\033[0m Please provide a middleware name. (e.g. php veldora make:middleware EnsureUserIsSubscribed)\n");
             exit(1);
         }
-        if (!str_ends_with($name, 'Middleware')) $name .= 'Middleware';
+        if (!str_ends_with($name, 'Middleware'))
+            $name .= 'Middleware';
         $file = $app->basePath("app/Http/Middleware/{$name}.php");
         $dir = dirname($file);
-        if (!is_dir($dir)) mkdir($dir, 0755, true);
+        if (!is_dir($dir))
+            mkdir($dir, 0755, true);
         if (file_exists($file)) {
             fwrite(STDERR, "\033[31mError:\033[0m Middleware already exists: app/Http/Middleware/{$name}.php\n");
             exit(1);
@@ -299,10 +301,12 @@ switch ($command) {
             fwrite(STDERR, "\033[31mError:\033[0m Please provide a request name. (e.g. php veldora make:request StorePostRequest)\n");
             exit(1);
         }
-        if (!str_ends_with($name, 'Request')) $name .= 'Request';
+        if (!str_ends_with($name, 'Request'))
+            $name .= 'Request';
         $file = $app->basePath("app/Http/Requests/{$name}.php");
         $dir = dirname($file);
-        if (!is_dir($dir)) mkdir($dir, 0755, true);
+        if (!is_dir($dir))
+            mkdir($dir, 0755, true);
         if (file_exists($file)) {
             fwrite(STDERR, "\033[31mError:\033[0m Request already exists: app/Http/Requests/{$name}.php\n");
             exit(1);
@@ -317,10 +321,12 @@ switch ($command) {
             fwrite(STDERR, "\033[31mError:\033[0m Please provide a seeder name. (e.g. php veldora make:seeder UserSeeder)\n");
             exit(1);
         }
-        if (!str_ends_with($name, 'Seeder')) $name .= 'Seeder';
+        if (!str_ends_with($name, 'Seeder'))
+            $name .= 'Seeder';
         $file = $app->basePath("database/seeders/{$name}.php");
         $dir = dirname($file);
-        if (!is_dir($dir)) mkdir($dir, 0755, true);
+        if (!is_dir($dir))
+            mkdir($dir, 0755, true);
         if (file_exists($file)) {
             fwrite(STDERR, "\033[31mError:\033[0m Seeder already exists: database/seeders/{$name}.php\n");
             exit(1);
@@ -335,10 +341,12 @@ switch ($command) {
             fwrite(STDERR, "\033[31mError:\033[0m Please provide a controller name. (e.g. php veldora make:controller PostController)\n");
             exit(1);
         }
-        if (!str_ends_with($name, 'Controller')) $name .= 'Controller';
+        if (!str_ends_with($name, 'Controller'))
+            $name .= 'Controller';
         $file = $app->basePath("app/Controllers/{$name}.php");
         $dir = dirname($file);
-        if (!is_dir($dir)) mkdir($dir, 0755, true);
+        if (!is_dir($dir))
+            mkdir($dir, 0755, true);
         if (file_exists($file)) {
             fwrite(STDERR, "\033[31mError:\033[0m Controller already exists: app/Controllers/{$name}.php\n");
             exit(1);
@@ -355,7 +363,8 @@ switch ($command) {
         }
         $file = $app->basePath("app/Models/{$name}.php");
         $dir = dirname($file);
-        if (!is_dir($dir)) mkdir($dir, 0755, true);
+        if (!is_dir($dir))
+            mkdir($dir, 0755, true);
         if (file_exists($file)) {
             fwrite(STDERR, "\033[31mError:\033[0m Model already exists: app/Models/{$name}.php\n");
             exit(1);
@@ -380,7 +389,8 @@ switch ($command) {
         $ts = date('Y_m_d_His');
         $file = $app->basePath("database/migrations/{$ts}_{$name}.php");
         $dir = dirname($file);
-        if (!is_dir($dir)) mkdir($dir, 0755, true);
+        if (!is_dir($dir))
+            mkdir($dir, 0755, true);
         file_put_contents($file, "<?php\n\ndeclare(strict_types=1);\n\nuse Veldora\Framework\Database\Schema\Blueprint;\nuse Veldora\Framework\Database\Schema\Migration;\nuse Veldora\Framework\Database\Schema\Schema;\n\nreturn new class extends Migration {\n    public function up(): void\n    {\n        Schema::create('{$name}', function (Blueprint \$table) {\n            \$table->id();\n            \$table->timestamps();\n        });\n    }\n\n    public function down(): void\n    {\n        Schema::dropIfExists('{$name}');\n    }\n};\n");
         echo "\033[32m✔ Created Migration:\033[0m database/migrations/{$ts}_{$name}.php\n";
         exit(0);
@@ -412,7 +422,7 @@ switch ($command) {
         break;
 
     case 'ui:list':
-        (new Veldora\Framework\Console\Commands\ListComponentsCommand())->execute(
+        (new Veldora\Framework\Console\Commands\ListComponentsCommand())->run(
             new Symfony\Component\Console\Input\ArrayInput([]),
             new Symfony\Component\Console\Output\ConsoleOutput()
         );
@@ -424,7 +434,7 @@ switch ($command) {
             fwrite(STDERR, "\033[31mError:\033[0m Please specify components to add (e.g. php veldora add button card modal)\n");
             exit(1);
         }
-        (new Veldora\Framework\Console\Commands\AddComponentCommand())->execute(
+        (new Veldora\Framework\Console\Commands\AddComponentCommand())->run(
             new Symfony\Component\Console\Input\ArrayInput(['components' => $components]),
             new Symfony\Component\Console\Output\ConsoleOutput()
         );
