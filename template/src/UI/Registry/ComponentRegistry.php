@@ -43,27 +43,46 @@ class ComponentRegistry
     private function loadComponents(): array
     {
         return [
-            'button'   => $this->button(),
-            'input'    => $this->input(),
-            'textarea' => $this->textarea(),
-            'select'   => $this->select(),
-            'checkbox' => $this->checkbox(),
-            'radio'    => $this->radio(),
-            'badge'    => $this->badge(),
-            'alert'    => $this->alert(),
-            'card'     => $this->card(),
-            'modal'    => $this->modal(),
-            'spinner'  => $this->spinner(),
-            'avatar'   => $this->avatar(),
-            'dropdown'   => $this->dropdown(),
-            'navbar'     => $this->navbar(),
-            'toast'      => $this->toast(),
-            'tabs'       => $this->tabs(),
-            'accordion'  => $this->accordion(),
-            'progress'   => $this->progress(),
-            'tooltip'    => $this->tooltip(),
-            'breadcrumb' => $this->breadcrumb(),
-            'table'      => $this->table(),
+            'button'      => $this->button(),
+            'input'       => $this->input(),
+            'textarea'    => $this->textarea(),
+            'select'      => $this->select(),
+            'checkbox'    => $this->checkbox(),
+            'radio'       => $this->radio(),
+            'badge'       => $this->badge(),
+            'alert'       => $this->alert(),
+            'card'        => $this->card(),
+            'modal'       => $this->modal(),
+            'spinner'     => $this->spinner(),
+            'avatar'      => $this->avatar(),
+            'dropdown'    => $this->dropdown(),
+            'navbar'      => $this->navbar(),
+            'toast'       => $this->toast(),
+            'tabs'        => $this->tabs(),
+            'accordion'   => $this->accordion(),
+            'progress'    => $this->progress(),
+            'tooltip'     => $this->tooltip(),
+            'breadcrumb'  => $this->breadcrumb(),
+            'table'       => $this->table(),
+            // ── New components ──────────────────────────────────────────────
+            'switch'      => $this->switch_(),
+            'pagination'  => $this->pagination(),
+            'skeleton'    => $this->skeleton(),
+            'empty'       => $this->empty_(),
+            'divider'     => $this->divider(),
+            'drawer'      => $this->drawer(),
+            'popover'     => $this->popover(),
+            'confirm'     => $this->confirm(),
+            'datepicker'  => $this->datepicker(),
+            'fileupload'  => $this->fileupload(),
+            'combobox'    => $this->combobox(),
+            'inputgroup'  => $this->inputgroup(),
+            'stat'        => $this->stat(),
+            'datatable'   => $this->datatable(),
+            'timeline'    => $this->timeline(),
+            'stepper'     => $this->stepper(),
+            'sidebar'     => $this->sidebar(),
+            'container'   => $this->container(),
         ];
     }
 
@@ -525,7 +544,9 @@ $sizeClass = $sizes[$size] ?? $sizes['md'];
             <?php if ($title): ?>
                 <h2 id="<?= $id ?>-title" class="vui-modal-title"><?= htmlspecialchars($title) ?></h2>
             <?php endif; ?>
-            <button type="button" class="vui-modal-close" onclick="document.getElementById('<?= $id ?>').setAttribute('aria-hidden','true')" aria-label="Close">✕</button>
+            <button type="button" class="vui-modal-close" onclick="document.getElementById('<?= $id ?>').setAttribute('aria-hidden','true')" aria-label="Close" style="display:inline-flex;align-items:center;justify-content:center;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
         </div>
         <div class="vui-modal-body">
             <?= $slot ?>
@@ -653,7 +674,9 @@ $menuClass = 'vui-dropdown-menu' . ($align === 'right' ? ' vui-dropdown-right' :
         onclick="(function(el){var open=el.getAttribute('aria-expanded')==='true';el.setAttribute('aria-expanded',!open);el.nextElementSibling.classList.toggle('vui-dropdown-open',!open);})(this)"
     >
         <?= htmlspecialchars($label) ?>
-        <span class="vui-dropdown-caret" aria-hidden="true">▾</span>
+        <span class="vui-dropdown-caret" aria-hidden="true" style="display:inline-flex;align-items:center;">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
     </button>
     <ul class="<?= $menuClass ?>" role="menu">
         <?= $slot ?>
@@ -706,10 +729,14 @@ $navId     = 'vui-nav-' . substr(md5($brand), 0, 6);
             class="vui-navbar-toggle"
             aria-controls="<?= $navId ?>"
             aria-expanded="false"
-            onclick="(function(btn){var open=btn.getAttribute('aria-expanded')==='true';btn.setAttribute('aria-expanded',!open);document.getElementById('<?= $navId ?>').classList.toggle('vui-navbar-open',!open);})(this)"
+            onclick="(function(btn){var open=btn.getAttribute('aria-expanded')==='true';btn.setAttribute('aria-expanded',!open);btn.classList.toggle('vui-toggle-active',!open);document.getElementById('<?= $navId ?>').classList.toggle('vui-navbar-open',!open);})(this)"
             aria-label="Toggle navigation"
         >
-            <span class="vui-navbar-burger"></span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <line x1="3" y1="12" x2="21" y2="12"/>
+                <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
         </button>
 
         <div id="<?= $navId ?>" class="vui-navbar-menu">
@@ -740,7 +767,12 @@ $variant  = $variant  ?? 'info';
 $message  = $message  ?? ($slot ?? '');
 $duration = $duration ?? 3500;
 
-$icons    = ['success' => '✓', 'warning' => '⚠', 'danger' => '✕', 'info' => 'ℹ'];
+$icons = [
+    'success' => '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    'warning' => '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    'danger'  => '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+    'info'    => '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
+];
 $variants = ['success' => 'vui-toast-success', 'warning' => 'vui-toast-warning', 'danger' => 'vui-toast-danger', 'info' => 'vui-toast-info'];
 $class    = 'vui-toast ' . ($variants[$variant] ?? $variants['info']);
 $icon     = $icons[$variant] ?? $icons['info'];
@@ -748,7 +780,9 @@ $icon     = $icons[$variant] ?? $icons['info'];
 <div id="<?= htmlspecialchars($id) ?>" class="<?= $class ?>" role="status" aria-live="polite" aria-atomic="true">
     <span class="vui-toast-icon" aria-hidden="true"><?= $icon ?></span>
     <span class="vui-toast-message"><?= htmlspecialchars($message) ?></span>
-    <button type="button" class="vui-toast-close" onclick="document.getElementById('<?= $id ?>').remove()" aria-label="Dismiss">✕</button>
+    <button type="button" class="vui-toast-close" onclick="document.getElementById('<?= $id ?>').remove()" aria-label="Dismiss" style="display:inline-flex;align-items:center;justify-content:center;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
 </div>
 
 <script>
@@ -993,4 +1027,798 @@ if ($isCompact)  $tableClasses .= ' vui-table-compact';
 TEMPLATE,
         ];
     }
+
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** @return array{description: string, usage: string, template: string} */
+    private function switch_(): array
+    {
+        return [
+            'description' => 'Toggle switch — on/off boolean input with label support',
+            'usage'       => '<x-switch name="notifications" label="Enable notifications" :checked="true" />',
+            'template'    => <<<'TEMPLATE'
+<?php
+// Veldora UI — Switch Component
+// Props: name, id, label, checked (bool), disabled (bool), size (sm|md|lg)
+$name     = $name     ?? 'toggle';
+$id       = $id       ?? $name;
+$label    = $label    ?? null;
+$checked  = !empty($checked);
+$disabled = !empty($disabled);
+$size     = $size     ?? 'md';
+$sizeClass = match($size) { 'sm' => 'vui-switch-sm', 'lg' => 'vui-switch-lg', default => 'vui-switch-md' };
+$checkedAttr  = $checked  ? 'checked' : '';
+$disabledAttr = $disabled ? 'disabled' : '';
+?>
+<label class="vui-switch-wrapper <?= $disabled ? 'vui-switch-disabled' : '' ?>">
+    <input type="checkbox" id="<?= htmlspecialchars($id) ?>" name="<?= htmlspecialchars($name) ?>"
+           class="vui-switch-input" role="switch" aria-checked="<?= $checked ? 'true' : 'false' ?>"
+           <?= $checkedAttr ?> <?= $disabledAttr ?>>
+    <span class="vui-switch-track <?= $sizeClass ?>">
+        <span class="vui-switch-thumb"></span>
+    </span>
+    <?php if ($label): ?>
+        <span class="vui-switch-label"><?= htmlspecialchars($label) ?></span>
+    <?php endif; ?>
+</label>
+TEMPLATE,
+        ];
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** @return array{description: string, usage: string, template: string} */
+    private function pagination(): array
+    {
+        return [
+            'description' => 'Pagination bar — current page, total pages, prev/next links',
+            'usage'       => '<x-pagination :current="3" :total="10" url="/posts?page=" />',
+            'template'    => <<<'TEMPLATE'
+<?php
+// Veldora UI — Pagination Component
+// Props: current (int), total (int), url (string base), window (int)
+$current = (int)($current ?? 1);
+$total   = (int)($total   ?? 1);
+$url     = $url     ?? '?page=';
+$window  = (int)($window  ?? 2);
+$prev = max(1, $current - 1);
+$next = min($total, $current + 1);
+$start = max(1, $current - $window);
+$end   = min($total, $current + $window);
+?>
+<nav class="vui-pagination" aria-label="Pagination">
+    <a href="<?= htmlspecialchars($url . $prev) ?>" class="vui-page-btn <?= $current <= 1 ? 'vui-page-disabled' : '' ?>" aria-label="Previous" <?= $current <= 1 ? 'aria-disabled="true"' : '' ?>>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+    </a>
+    <?php if ($start > 1): ?>
+        <a href="<?= htmlspecialchars($url . '1') ?>" class="vui-page-btn">1</a>
+        <?php if ($start > 2): ?><span class="vui-page-ellipsis">&hellip;</span><?php endif; ?>
+    <?php endif; ?>
+    <?php for ($i = $start; $i <= $end; $i++): ?>
+        <a href="<?= htmlspecialchars($url . $i) ?>" class="vui-page-btn <?= $i === $current ? 'vui-page-active' : '' ?>" <?= $i === $current ? 'aria-current="page"' : '' ?>><?= $i ?></a>
+    <?php endfor; ?>
+    <?php if ($end < $total): ?>
+        <?php if ($end < $total - 1): ?><span class="vui-page-ellipsis">&hellip;</span><?php endif; ?>
+        <a href="<?= htmlspecialchars($url . $total) ?>" class="vui-page-btn"><?= $total ?></a>
+    <?php endif; ?>
+    <a href="<?= htmlspecialchars($url . $next) ?>" class="vui-page-btn <?= $current >= $total ? 'vui-page-disabled' : '' ?>" aria-label="Next" <?= $current >= $total ? 'aria-disabled="true"' : '' ?>>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+    </a>
+</nav>
+TEMPLATE,
+        ];
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** @return array{description: string, usage: string, template: string} */
+    private function skeleton(): array
+    {
+        return [
+            'description' => 'Skeleton loader — animated placeholder for loading content',
+            'usage'       => '<x-skeleton lines="3" avatar="true" />',
+            'template'    => <<<'TEMPLATE'
+<?php
+// Veldora UI — Skeleton Component
+// Props: lines (int), avatar (bool), width (string), height (string), type (text|circle|rect)
+$lines  = (int)($lines ?? 3);
+$avatar = !empty($avatar);
+$width  = $width  ?? '100%';
+$height = $height ?? '1rem';
+$type   = $type   ?? 'text';
+?>
+<div class="vui-skeleton-wrap" aria-busy="true" aria-label="Loading...">
+    <?php if ($avatar): ?>
+        <div class="vui-skeleton vui-skeleton-circle" style="width:2.5rem;height:2.5rem"></div>
+    <?php endif; ?>
+    <?php if ($type === 'rect'): ?>
+        <div class="vui-skeleton vui-skeleton-rect" style="width:<?= htmlspecialchars($width) ?>;height:<?= htmlspecialchars($height) ?>"></div>
+    <?php else: ?>
+        <?php for ($i = 0; $i < $lines; $i++): ?>
+            <div class="vui-skeleton vui-skeleton-text" style="width:<?= $i === $lines - 1 ? '70%' : '100%' ?>"></div>
+        <?php endfor; ?>
+    <?php endif; ?>
+</div>
+TEMPLATE,
+        ];
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** @return array{description: string, usage: string, template: string} */
+    private function empty_(): array
+    {
+        return [
+            'description' => 'Empty state — illustration, title, description and action slot for zero-data screens',
+            'usage'       => '<x-empty title="No results found" description="Try a different search term." />',
+            'template'    => <<<'TEMPLATE'
+<?php
+// Veldora UI — Empty State Component
+// Props: title, description, icon
+$title       = $title       ?? 'Nothing here yet';
+$description = $description ?? 'Get started by adding something new.';
+$icon        = $icon        ?? null;
+?>
+<div class="vui-empty">
+    <div class="vui-empty-icon">
+        <?php if ($icon): ?>
+            <?= $icon ?>
+        <?php else: ?>
+            <svg width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+                <circle cx="32" cy="32" r="30" stroke="currentColor" stroke-width="2" stroke-dasharray="6 4"/>
+                <path d="M22 32h20M32 22v20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        <?php endif; ?>
+    </div>
+    <h3 class="vui-empty-title"><?= htmlspecialchars($title) ?></h3>
+    <p class="vui-empty-desc"><?= htmlspecialchars($description) ?></p>
+    <?php if (!empty($slot)): ?>
+        <div class="vui-empty-action"><?= $slot ?></div>
+    <?php endif; ?>
+</div>
+TEMPLATE,
+        ];
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** @return array{description: string, usage: string, template: string} */
+    private function divider(): array
+    {
+        return [
+            'description' => 'Divider — horizontal or vertical separator with optional label',
+            'usage'       => '<x-divider label="OR" />',
+            'template'    => <<<'TEMPLATE'
+<?php
+// Veldora UI — Divider Component
+// Props: label, orientation (horizontal|vertical)
+$label       = $label       ?? null;
+$orientation = $orientation ?? 'horizontal';
+?>
+<?php if ($orientation === 'vertical'): ?>
+    <div class="vui-divider-vertical" role="separator" aria-orientation="vertical"></div>
+<?php elseif ($label): ?>
+    <div class="vui-divider-labeled" role="separator">
+        <span class="vui-divider-line"></span>
+        <span class="vui-divider-label"><?= htmlspecialchars($label) ?></span>
+        <span class="vui-divider-line"></span>
+    </div>
+<?php else: ?>
+    <hr class="vui-divider" role="separator">
+<?php endif; ?>
+TEMPLATE,
+        ];
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** @return array{description: string, usage: string, template: string} */
+    private function drawer(): array
+    {
+        return [
+            'description' => 'Slide-in drawer panel — left/right/top/bottom, with overlay and close button',
+            'usage'       => '<x-drawer id="my-drawer" position="right" title="Settings">Content</x-drawer>',
+            'template'    => <<<'TEMPLATE'
+<?php
+// Veldora UI — Drawer Component
+// Props: id, title, position (left|right|top|bottom)
+$id       = $id       ?? 'vui-drawer-' . uniqid();
+$title    = $title    ?? null;
+$position = $position ?? 'right';
+$posClass = 'vui-drawer-' . htmlspecialchars($position);
+?>
+<div id="<?= htmlspecialchars($id) ?>" class="vui-drawer-backdrop" role="dialog" aria-modal="true" aria-hidden="true"
+     onclick="if(event.target===this)this.setAttribute('aria-hidden','true')">
+    <div class="vui-drawer <?= $posClass ?>">
+        <?php if ($title): ?>
+            <div class="vui-drawer-header">
+                <h2 class="vui-drawer-title"><?= htmlspecialchars($title) ?></h2>
+                <button class="vui-drawer-close" aria-label="Close"
+                        onclick="document.getElementById('<?= htmlspecialchars($id) ?>').setAttribute('aria-hidden','true')">&times;</button>
+            </div>
+        <?php endif; ?>
+        <div class="vui-drawer-body"><?= $slot ?? '' ?></div>
+    </div>
+</div>
+<script>
+window.vui = window.vui || {};
+vui.openDrawer  = function(id) { document.getElementById(id).setAttribute('aria-hidden','false'); };
+vui.closeDrawer = function(id) { document.getElementById(id).setAttribute('aria-hidden','true'); };
+</script>
+TEMPLATE,
+        ];
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** @return array{description: string, usage: string, template: string} */
+    private function popover(): array
+    {
+        return [
+            'description' => 'Popover — floating content panel anchored to a trigger element',
+            'usage'       => '<x-popover trigger="Click me" title="Info">Popover content here</x-popover>',
+            'template'    => <<<'TEMPLATE'
+<?php
+// Veldora UI — Popover Component
+// Props: trigger, title, placement (top|bottom|left|right)
+$trigger   = $trigger   ?? 'Open';
+$title     = $title     ?? null;
+$placement = $placement ?? 'bottom';
+$uid = 'pop-' . substr(md5(uniqid()), 0, 6);
+?>
+<div class="vui-popover-wrap">
+    <button class="vui-popover-trigger" type="button"
+            onclick="const p=document.getElementById('<?= $uid ?>');p.hidden=!p.hidden"
+            aria-expanded="false" aria-controls="<?= $uid ?>">
+        <?= htmlspecialchars($trigger) ?>
+    </button>
+    <div id="<?= $uid ?>" class="vui-popover vui-popover-<?= htmlspecialchars($placement) ?>" hidden role="tooltip">
+        <?php if ($title): ?>
+            <div class="vui-popover-title"><?= htmlspecialchars($title) ?></div>
+        <?php endif; ?>
+        <div class="vui-popover-body"><?= $slot ?? '' ?></div>
+    </div>
+</div>
+TEMPLATE,
+        ];
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** @return array{description: string, usage: string, template: string} */
+    private function confirm(): array
+    {
+        return [
+            'description' => 'Confirm dialog — modal with confirm/cancel for destructive operations',
+            'usage'       => '<x-confirm id="del-confirm" title="Delete item?" confirm-label="Delete" :danger="true" />',
+            'template'    => <<<'TEMPLATE'
+<?php
+// Veldora UI — Confirm Dialog Component
+// Props: id, title, message, confirmLabel, cancelLabel, danger (bool), action, method
+$id           = $id           ?? 'vui-confirm-' . uniqid();
+$title        = $title        ?? 'Are you sure?';
+$message      = $message      ?? 'This action cannot be undone.';
+$confirmLabel = $confirmLabel ?? 'Confirm';
+$cancelLabel  = $cancelLabel  ?? 'Cancel';
+$danger       = !empty($danger);
+$action       = $action       ?? '#';
+$method       = strtoupper($method ?? 'POST');
+?>
+<div id="<?= htmlspecialchars($id) ?>" class="vui-modal-backdrop" role="alertdialog" aria-modal="true"
+     aria-hidden="true" aria-labelledby="<?= htmlspecialchars($id) ?>-title">
+    <div class="vui-modal vui-confirm-dialog">
+        <div class="vui-modal-header">
+            <h3 id="<?= htmlspecialchars($id) ?>-title" class="vui-modal-title"><?= htmlspecialchars($title) ?></h3>
+        </div>
+        <div class="vui-modal-body">
+            <p><?= htmlspecialchars($message) ?></p>
+        </div>
+        <div class="vui-modal-footer">
+            <button type="button" class="vui-btn vui-btn-secondary"
+                    onclick="document.getElementById('<?= htmlspecialchars($id) ?>').setAttribute('aria-hidden','true')">
+                <?= htmlspecialchars($cancelLabel) ?>
+            </button>
+            <form action="<?= htmlspecialchars($action) ?>" method="POST" style="display:inline">
+                <?php if ($method !== 'POST'): ?>
+                    <input type="hidden" name="_method" value="<?= htmlspecialchars($method) ?>">
+                <?php endif; ?>
+                <button type="submit" class="vui-btn <?= $danger ? 'vui-btn-danger' : 'vui-btn-primary' ?>">
+                    <?= htmlspecialchars($confirmLabel) ?>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+window.vui = window.vui || {};
+vui.confirm = function(id) { document.getElementById(id).setAttribute('aria-hidden','false'); };
+</script>
+TEMPLATE,
+        ];
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** @return array{description: string, usage: string, template: string} */
+    private function datepicker(): array
+    {
+        return [
+            'description' => 'Date picker input — native date input with label and Veldora styling',
+            'usage'       => '<x-datepicker name="dob" label="Date of Birth" min="2000-01-01" />',
+            'template'    => <<<'TEMPLATE'
+<?php
+// Veldora UI — DatePicker Component
+// Props: name, id, label, value, min, max, required (bool), disabled (bool), helper
+$name     = $name     ?? 'date';
+$id       = $id       ?? $name;
+$label    = $label    ?? null;
+$value    = $value    ?? '';
+$min      = $min      ?? '';
+$max      = $max      ?? '';
+$required = !empty($required);
+$disabled = !empty($disabled);
+$helper   = $helper   ?? null;
+?>
+<div class="vui-field">
+    <?php if ($label): ?>
+        <label for="<?= htmlspecialchars($id) ?>" class="vui-label">
+            <?= htmlspecialchars($label) ?>
+            <?php if ($required): ?><span class="vui-required" aria-hidden="true">*</span><?php endif; ?>
+        </label>
+    <?php endif; ?>
+    <input type="date" id="<?= htmlspecialchars($id) ?>" name="<?= htmlspecialchars($name) ?>"
+           class="vui-input vui-datepicker"
+           value="<?= htmlspecialchars($value) ?>"
+           <?= $min ? 'min="' . htmlspecialchars($min) . '"' : '' ?>
+           <?= $max ? 'max="' . htmlspecialchars($max) . '"' : '' ?>
+           <?= $required ? 'required' : '' ?>
+           <?= $disabled ? 'disabled' : '' ?>>
+    <?php if ($helper): ?>
+        <p class="vui-helper"><?= htmlspecialchars($helper) ?></p>
+    <?php endif; ?>
+</div>
+TEMPLATE,
+        ];
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** @return array{description: string, usage: string, template: string} */
+    private function fileupload(): array
+    {
+        return [
+            'description' => 'File upload — styled drag-and-drop zone with file type and size hints',
+            'usage'       => '<x-fileupload name="avatar" label="Profile Picture" accept="image/*" />',
+            'template'    => <<<'TEMPLATE'
+<?php
+// Veldora UI — FileUpload Component
+// Props: name, id, label, accept, multiple (bool), required (bool), helper, maxSize
+$name     = $name     ?? 'file';
+$id       = $id       ?? $name;
+$label    = $label    ?? 'Choose file';
+$accept   = $accept   ?? '*';
+$multiple = !empty($multiple);
+$required = !empty($required);
+$helper   = $helper   ?? null;
+$maxSize  = $maxSize  ?? null;
+?>
+<div class="vui-field">
+    <label for="<?= htmlspecialchars($id) ?>" class="vui-label"><?= htmlspecialchars($label) ?></label>
+    <label for="<?= htmlspecialchars($id) ?>" class="vui-fileupload-zone">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        <span class="vui-fileupload-text">Drag &amp; drop or <strong>browse</strong></span>
+        <?php if ($maxSize): ?>
+            <span class="vui-fileupload-hint">Max <?= htmlspecialchars($maxSize) ?></span>
+        <?php endif; ?>
+        <input type="file" id="<?= htmlspecialchars($id) ?>" name="<?= htmlspecialchars($name) ?>"
+               accept="<?= htmlspecialchars($accept) ?>" class="vui-fileupload-input"
+               <?= $multiple ? 'multiple' : '' ?> <?= $required ? 'required' : '' ?>>
+    </label>
+    <?php if ($helper): ?><p class="vui-helper"><?= htmlspecialchars($helper) ?></p><?php endif; ?>
+</div>
+TEMPLATE,
+        ];
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** @return array{description: string, usage: string, template: string} */
+    private function combobox(): array
+    {
+        return [
+            'description' => 'Combobox — searchable select with autocomplete dropdown',
+            'usage'       => '<x-combobox name="country" label="Country" :options="$countries" />',
+            'template'    => <<<'TEMPLATE'
+<?php
+// Veldora UI — Combobox Component
+// Props: name, id, label, options (array value=>label), value, placeholder, required (bool)
+$name        = $name        ?? 'combobox';
+$id          = $id          ?? $name;
+$label       = $label       ?? null;
+$options     = $options      ?? [];
+$value       = $value       ?? '';
+$placeholder = $placeholder ?? 'Search...';
+$required    = !empty($required);
+$uid = 'cb-' . substr(md5($id), 0, 6);
+?>
+<div class="vui-field vui-combobox-wrap" id="<?= $uid ?>">
+    <?php if ($label): ?>
+        <label class="vui-label" for="<?= htmlspecialchars($id) ?>-input"><?= htmlspecialchars($label) ?></label>
+    <?php endif; ?>
+    <div class="vui-combobox">
+        <input type="text" id="<?= htmlspecialchars($id) ?>-input" class="vui-input vui-combobox-input"
+               placeholder="<?= htmlspecialchars($placeholder) ?>" autocomplete="off"
+               oninput="vuiCbFilter('<?= $uid ?>')" onfocus="vuiCbOpen('<?= $uid ?>')">
+        <input type="hidden" name="<?= htmlspecialchars($name) ?>" id="<?= htmlspecialchars($id) ?>"
+               value="<?= htmlspecialchars($value) ?>" <?= $required ? 'required' : '' ?>>
+        <ul class="vui-combobox-list" id="<?= $uid ?>-list" role="listbox" hidden>
+            <?php foreach ($options as $val => $lbl): ?>
+                <li class="vui-combobox-option" role="option"
+                    data-value="<?= htmlspecialchars((string)$val) ?>"
+                    onclick="vuiCbSelect('<?= $uid ?>','<?= htmlspecialchars((string)$val) ?>',this.textContent.trim())">
+                    <?= htmlspecialchars((string)$lbl) ?>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+</div>
+<script>
+function vuiCbOpen(u){document.getElementById(u+'-list').hidden=false;}
+function vuiCbFilter(u){
+    var q=document.querySelector('#'+u+' .vui-combobox-input').value.toLowerCase();
+    document.querySelectorAll('#'+u+'-list .vui-combobox-option').forEach(function(o){o.hidden=!o.textContent.toLowerCase().includes(q);});
+    document.getElementById(u+'-list').hidden=false;
 }
+function vuiCbSelect(u,val,lbl){
+    document.querySelector('#'+u+' .vui-combobox-input').value=lbl;
+    document.querySelector('#'+u+' input[type=hidden]').value=val;
+    document.getElementById(u+'-list').hidden=true;
+}
+document.addEventListener('click',function(e){
+    document.querySelectorAll('.vui-combobox-list').forEach(function(l){
+        if(!l.closest('.vui-combobox-wrap').contains(e.target))l.hidden=true;
+    });
+});
+</script>
+TEMPLATE,
+        ];
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** @return array{description: string, usage: string, template: string} */
+    private function inputgroup(): array
+    {
+        return [
+            'description' => 'Input group — prefix/suffix addon (text or icon) attached to an input',
+            'usage'       => '<x-inputgroup name="price" prefix="$" suffix=".00" placeholder="0" />',
+            'template'    => <<<'TEMPLATE'
+<?php
+// Veldora UI — InputGroup Component
+// Props: name, id, type, label, placeholder, value, prefix, suffix, required (bool), disabled (bool)
+$name        = $name        ?? 'field';
+$id          = $id          ?? $name;
+$type        = $type        ?? 'text';
+$label       = $label       ?? null;
+$placeholder = $placeholder ?? '';
+$value       = $value       ?? '';
+$prefix      = $prefix      ?? null;
+$suffix      = $suffix      ?? null;
+$required    = !empty($required);
+$disabled    = !empty($disabled);
+?>
+<div class="vui-field">
+    <?php if ($label): ?>
+        <label for="<?= htmlspecialchars($id) ?>" class="vui-label"><?= htmlspecialchars($label) ?></label>
+    <?php endif; ?>
+    <div class="vui-input-group <?= $disabled ? 'vui-input-group-disabled' : '' ?>">
+        <?php if ($prefix): ?><span class="vui-input-addon vui-input-prefix"><?= htmlspecialchars($prefix) ?></span><?php endif; ?>
+        <input type="<?= htmlspecialchars($type) ?>" id="<?= htmlspecialchars($id) ?>" name="<?= htmlspecialchars($name) ?>"
+               class="vui-input" placeholder="<?= htmlspecialchars($placeholder) ?>"
+               value="<?= htmlspecialchars($value) ?>"
+               <?= $required ? 'required' : '' ?> <?= $disabled ? 'disabled' : '' ?>>
+        <?php if ($suffix): ?><span class="vui-input-addon vui-input-suffix"><?= htmlspecialchars($suffix) ?></span><?php endif; ?>
+    </div>
+</div>
+TEMPLATE,
+        ];
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** @return array{description: string, usage: string, template: string} */
+    private function stat(): array
+    {
+        return [
+            'description' => 'Stat card — metric display with value, label, icon, and optional trend indicator',
+            'usage'       => '<x-stat label="Total Users" value="12,403" trend="+8.2%" :trend-up="true" />',
+            'template'    => <<<'TEMPLATE'
+<?php
+// Veldora UI — Stat Component
+// Props: label, value, trend, trendUp (bool), icon, prefix, suffix
+$label   = $label   ?? 'Metric';
+$value   = $value   ?? '0';
+$trend   = $trend   ?? null;
+$trendUp = !empty($trendUp);
+$icon    = $icon    ?? null;
+$prefix  = $prefix  ?? '';
+$suffix  = $suffix  ?? '';
+?>
+<div class="vui-stat">
+    <?php if ($icon): ?>
+        <div class="vui-stat-icon"><?= $icon ?></div>
+    <?php endif; ?>
+    <div class="vui-stat-body">
+        <p class="vui-stat-label"><?= htmlspecialchars($label) ?></p>
+        <p class="vui-stat-value"><?= htmlspecialchars($prefix) ?><?= htmlspecialchars($value) ?><?= htmlspecialchars($suffix) ?></p>
+        <?php if ($trend !== null): ?>
+            <span class="vui-stat-trend <?= $trendUp ? 'vui-trend-up' : 'vui-trend-down' ?>">
+                <?php if ($trendUp): ?>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+                <?php else: ?>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                <?php endif; ?>
+                <?= htmlspecialchars($trend) ?>
+            </span>
+        <?php endif; ?>
+    </div>
+</div>
+TEMPLATE,
+        ];
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** @return array{description: string, usage: string, template: string} */
+    private function datatable(): array
+    {
+        return [
+            'description' => 'DataTable — interactive table with client-side search, sort, and pagination',
+            'usage'       => '<x-datatable :columns="$cols" :rows="$rows" :searchable="true" :per-page="10" />',
+            'template'    => <<<'TEMPLATE'
+<?php
+// Veldora UI — DataTable Component
+// Props: columns (assoc array key=>label), rows (array of assoc arrays), searchable (bool), perPage (int)
+$columns    = $columns    ?? [];
+$rows       = $rows       ?? [];
+$searchable = !empty($searchable);
+$perPage    = (int)($perPage ?? 10);
+$uid = 'dt-' . substr(md5(uniqid()), 0, 6);
+$colKeys = array_keys($columns);
+?>
+<div class="vui-datatable-wrap" id="<?= $uid ?>">
+    <?php if ($searchable): ?>
+        <div class="vui-datatable-toolbar">
+            <input type="search" class="vui-input vui-datatable-search" placeholder="Search..."
+                   oninput="vuiDt_<?= $uid ?>_search(this.value)">
+        </div>
+    <?php endif; ?>
+    <div class="vui-table-responsive">
+        <table class="vui-table vui-table-hover vui-table-striped">
+            <thead>
+                <tr>
+                    <?php foreach ($columns as $key => $lbl): ?>
+                        <th onclick="vuiDt_<?= $uid ?>_sort('<?= htmlspecialchars((string)$key) ?>')" style="cursor:pointer">
+                            <div style="display:flex;align-items:center;gap:6px;">
+                                <span><?= htmlspecialchars((string)$lbl) ?></span>
+                                <svg class="vui-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
+                            </div>
+                        </th>
+                    <?php endforeach; ?>
+                </tr>
+            </thead>
+            <tbody id="<?= $uid ?>-tbody">
+                <?php foreach ($rows as $row): ?>
+                    <tr><?php foreach ($colKeys as $k): ?>
+                        <td><?= htmlspecialchars((string)($row[$k] ?? '')) ?></td>
+                    <?php endforeach; ?></tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <div id="<?= $uid ?>-pages" class="vui-datatable-pages"></div>
+</div>
+<script>
+(function(){
+    var uid='<?= $uid ?>',perPage=<?= $perPage ?>,page=1,q='',asc=true,sKey='';
+    var tbody=document.getElementById(uid+'-tbody');
+    var allRows=Array.from(tbody.querySelectorAll('tr'));
+    function filtered(){return q?allRows.filter(function(r){return r.textContent.toLowerCase().includes(q);}):allRows.slice();}
+    function render(){
+        var f=filtered();
+        var tot=Math.ceil(f.length/perPage)||1;
+        if(page>tot)page=1;
+        tbody.innerHTML='';
+        f.slice((page-1)*perPage,page*perPage).forEach(function(r){tbody.appendChild(r);});
+        var pg=document.getElementById(uid+'-pages');
+        pg.innerHTML='';
+        for(var i=1;i<=tot;i++){
+            var b=document.createElement('button');
+            b.textContent=i;b.className='vui-page-btn'+(i===page?' vui-page-active':'');
+            b.setAttribute('data-p',i);
+            b.onclick=(function(p){return function(){page=p;render();};})(i);
+            pg.appendChild(b);
+        }
+    }
+    window['vuiDt_'+uid+'_search']=function(v){q=v.toLowerCase();page=1;render();};
+    window['vuiDt_'+uid+'_sort']=function(k){
+        if(sKey===k)asc=!asc;else{sKey=k;asc=true;}
+        var idx=<?= json_encode($colKeys) ?>.indexOf(k);
+        allRows.sort(function(a,b){
+            var av=(a.cells[idx]||{}).textContent||'';
+            var bv=(b.cells[idx]||{}).textContent||'';
+            return asc?av.localeCompare(bv,undefined,{numeric:true}):bv.localeCompare(av,undefined,{numeric:true});
+        });
+        render();
+    };
+    render();
+}());
+</script>
+TEMPLATE,
+        ];
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** @return array{description: string, usage: string, template: string} */
+    private function timeline(): array
+    {
+        return [
+            'description' => 'Timeline — vertical event list with icon, title, description, and timestamp',
+            'usage'       => '<x-timeline :items="$events" />',
+            'template'    => <<<'TEMPLATE'
+<?php
+// Veldora UI — Timeline Component
+// Props: items (array of {title, description, time, icon, color})
+$items = $items ?? [];
+?>
+<ol class="vui-timeline">
+    <?php foreach ($items as $item): ?>
+        <li class="vui-timeline-item">
+            <div class="vui-timeline-marker" style="<?= !empty($item['color']) ? 'background:' . htmlspecialchars($item['color']) : '' ?>">
+                <?= $item['icon'] ?? '' ?>
+            </div>
+            <div class="vui-timeline-content">
+                <p class="vui-timeline-title"><?= htmlspecialchars($item['title'] ?? '') ?></p>
+                <?php if (!empty($item['description'])): ?>
+                    <p class="vui-timeline-desc"><?= htmlspecialchars($item['description']) ?></p>
+                <?php endif; ?>
+                <?php if (!empty($item['time'])): ?>
+                    <time class="vui-timeline-time"><?= htmlspecialchars($item['time']) ?></time>
+                <?php endif; ?>
+            </div>
+        </li>
+    <?php endforeach; ?>
+</ol>
+TEMPLATE,
+        ];
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** @return array{description: string, usage: string, template: string} */
+    private function stepper(): array
+    {
+        return [
+            'description' => 'Stepper — multi-step wizard indicator showing completed, active, and upcoming steps',
+            'usage'       => "<x-stepper :steps=\"['Account','Profile','Confirm']\" :current=\"2\" />",
+            'template'    => <<<'TEMPLATE'
+<?php
+// Veldora UI — Stepper Component
+// Props: steps (array of labels), current (1-indexed int)
+$steps   = $steps   ?? [];
+$current = (int)($current ?? 1);
+?>
+<ol class="vui-stepper" aria-label="Progress">
+    <?php foreach ($steps as $i => $step): ?>
+        <?php
+        $num    = $i + 1;
+        $status = $num < $current ? 'done' : ($num === $current ? 'active' : 'pending');
+        ?>
+        <li class="vui-stepper-step vui-step-<?= $status ?>" aria-current="<?= $status === 'active' ? 'step' : 'false' ?>">
+            <span class="vui-step-circle">
+                <?php if ($status === 'done'): ?>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                <?php else: ?>
+                    <?= $num ?>
+                <?php endif; ?>
+            </span>
+            <span class="vui-step-label"><?= htmlspecialchars((string)$step) ?></span>
+            <?php if ($num < count($steps)): ?>
+                <span class="vui-step-line" aria-hidden="true"></span>
+            <?php endif; ?>
+        </li>
+    <?php endforeach; ?>
+</ol>
+TEMPLATE,
+        ];
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** @return array{description: string, usage: string, template: string} */
+    private function sidebar(): array
+    {
+        return [
+            'description' => 'Sidebar — navigation sidebar with logo, nav items, and collapsible sub-menus',
+            'usage'       => '<x-sidebar :items="$navItems" logo="MyApp" />',
+            'template'    => <<<'TEMPLATE'
+<?php
+// Veldora UI — Sidebar Component
+// Props: items (array of {label, href, icon, active, children[]}), logo, collapsed (bool)
+$items     = $items     ?? [];
+$logo      = $logo      ?? 'App';
+$collapsed = !empty($collapsed);
+?>
+<aside class="vui-sidebar <?= $collapsed ? 'vui-sidebar-collapsed' : '' ?>" role="navigation">
+    <div class="vui-sidebar-header">
+        <span class="vui-sidebar-logo"><?= htmlspecialchars($logo) ?></span>
+    </div>
+    <nav>
+        <ul class="vui-sidebar-nav">
+            <?php foreach ($items as $item): ?>
+                <?php $active = !empty($item['active']); ?>
+                <li class="vui-nav-item <?= $active ? 'vui-nav-active' : '' ?>">
+                    <a href="<?= htmlspecialchars($item['href'] ?? '#') ?>" class="vui-nav-link">
+                        <?php if (!empty($item['icon'])): ?>
+                            <span class="vui-nav-icon" aria-hidden="true"><?= $item['icon'] ?></span>
+                        <?php endif; ?>
+                        <span class="vui-nav-label"><?= htmlspecialchars($item['label'] ?? '') ?></span>
+                    </a>
+                    <?php if (!empty($item['children'])): ?>
+                        <ul class="vui-nav-sub">
+                            <?php foreach ($item['children'] as $child): ?>
+                                <li>
+                                    <a href="<?= htmlspecialchars($child['href'] ?? '#') ?>" class="vui-nav-link vui-nav-sub-link">
+                                        <?= htmlspecialchars($child['label'] ?? '') ?>
+                                    </a>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    </nav>
+    <?php if (!empty($slot)): ?><div class="vui-sidebar-footer"><?= $slot ?></div><?php endif; ?>
+</aside>
+TEMPLATE,
+        ];
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** @return array{description: string, usage: string, template: string} */
+    private function container(): array
+    {
+        return [
+            'description' => 'Container — responsive max-width wrapper with configurable size and padding',
+            'usage'       => '<x-container size="lg">Page content</x-container>',
+            'template'    => <<<'TEMPLATE'
+<?php
+// Veldora UI — Container Component
+// Props: size (sm|md|lg|xl|full), center (bool)
+$size   = $size  ?? 'lg';
+$center = isset($center) ? !empty($center) : true;
+$extra  = $class ?? '';
+$sizeMap = [
+    'sm'   => 'vui-container-sm',
+    'md'   => 'vui-container-md',
+    'lg'   => 'vui-container-lg',
+    'xl'   => 'vui-container-xl',
+    'full' => 'vui-container-full',
+];
+$cls = 'vui-container ' . ($sizeMap[$size] ?? $sizeMap['lg']) . ($center ? ' vui-container-center' : '') . ($extra ? ' ' . htmlspecialchars($extra) : '');
+?>
+<div class="<?= $cls ?>">
+    <?= $slot ?? '' ?>
+</div>
+TEMPLATE,
+        ];
+    }
+}
+
