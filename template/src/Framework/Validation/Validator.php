@@ -29,10 +29,26 @@ class Validator
      *
      * @param array<string, mixed> $data
      * @param array<string, string|array<mixed>> $rules
+     * @param array<string, string> $messages
      */
-    public function __construct(protected array $data, protected array $rules)
-    {
+    public function __construct(
+        protected array $data,
+        protected array $rules,
+        protected array $messages = []
+    ) {
         $this->validate();
+    }
+
+    /**
+     * Create a new Validator instance.
+     *
+     * @param array<string, mixed> $data
+     * @param array<string, string|array<mixed>> $rules
+     * @param array<string, string> $messages
+     */
+    public static function make(array $data, array $rules, array $messages = []): self
+    {
+        return new self($data, $rules, $messages);
     }
 
     /**

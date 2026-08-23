@@ -39,32 +39,29 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
-use Veldora\Framework\Http\Request;
-use Veldora\Framework\Validation\Validator;
+use Veldora\Framework\Http\FormRequest;
 
-class {$name}
+class {$name} extends FormRequest
 {
     /**
-     * Validation rules for this request.
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
      *
-     * @return array<string, string>
+     * @return array<string, array<string>|string>
      */
     public function rules(): array
     {
         return [
-            // 'field' => 'required|string|max:255',
+            // 'title' => 'required|string|max:255',
+            // 'email' => 'required|email',
         ];
-    }
-
-    /**
-     * Validate the incoming request against the defined rules.
-     *
-     * @return array<string, mixed>
-     * @throws \Veldora\Framework\Validation\ValidationException
-     */
-    public function validate(Request \$request): array
-    {
-        return Validator::make(\$request->all(), \$this->rules())->validate();
     }
 }
 PHP;
