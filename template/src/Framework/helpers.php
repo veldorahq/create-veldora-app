@@ -245,3 +245,85 @@ if (!function_exists('mailer')) {
     }
 }
 
+if (!function_exists('cache')) {
+    /**
+     * Get / set the specified cache value or retrieve the CacheManager.
+     */
+    function cache(mixed $key = null, mixed $default = null): mixed
+    {
+        /** @var \Veldora\Framework\Cache\CacheManager $cache */
+        $cache = app(\Veldora\Framework\Cache\CacheManager::class);
+
+        if ($key === null) {
+            return $cache;
+        }
+
+        if (is_array($key)) {
+            // Setting values from array: cache(['key' => 'val'], $ttl)
+            $ttl = is_int($default) ? $default : null;
+            foreach ($key as $k => $v) {
+                $cache->set($k, $v, $ttl);
+            }
+            return true;
+        }
+
+        return $cache->get((string) $key, $default);
+    }
+}
+
+if (!function_exists('storage')) {
+    /**
+     * Get a filesystem disk instance.
+     */
+    function storage(?string $disk = null): \Veldora\Framework\Storage\StorageDriverInterface
+    {
+        /** @var \Veldora\Framework\Storage\StorageManager $storage */
+        $storage = app(\Veldora\Framework\Storage\StorageManager::class);
+
+        return $storage->disk($disk);
+    }
+}
+
+if (!function_exists('logger')) {
+    /**
+     * Log a debug message to the logs or retrieve the LogManager instance.
+     */
+    function logger(?string $message = null, array $context = []): mixed
+    {
+        /** @var \Veldora\Framework\Logging\LogManager $log */
+        $log = app(\Veldora\Framework\Logging\LogManager::class);
+
+        if ($message === null) {
+            return $log;
+        }
+
+        $log->debug($message, $context);
+        return null;
+    }
+}
+
+if (!function_exists('log_info')) {
+    /**
+     * Log an informational message.
+     */
+    function log_info(string $message, array $context = []): void
+    {
+        /** @var \Veldora\Framework\Logging\LogManager $log */
+        $log = app(\Veldora\Framework\Logging\LogManager::class);
+        $log->info($message, $context);
+    }
+}
+
+if (!function_exists('log_error')) {
+    /**
+     * Log an error message with context.
+     */
+    function log_error(string $message, array $context = []): void
+    {
+        /** @var \Veldora\Framework\Logging\LogManager $log */
+        $log = app(\Veldora\Framework\Logging\LogManager::class);
+        $log->error($message, $context);
+    }
+}
+
+

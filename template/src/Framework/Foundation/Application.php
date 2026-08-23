@@ -103,6 +103,15 @@ final class Application extends Container
         $this->singleton(\Veldora\Framework\Mail\Mailer::class, function () {
             return new \Veldora\Framework\Mail\Mailer($this);
         });
+        $this->singleton(\Veldora\Framework\Cache\CacheManager::class, function () {
+            return new \Veldora\Framework\Cache\CacheManager($this);
+        });
+        $this->singleton(\Veldora\Framework\Storage\StorageManager::class, function () {
+            return new \Veldora\Framework\Storage\StorageManager($this);
+        });
+        $this->singleton(\Veldora\Framework\Logging\LogManager::class, function () {
+            return new \Veldora\Framework\Logging\LogManager($this);
+        });
     }
 
     /**
