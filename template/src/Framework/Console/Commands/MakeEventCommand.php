@@ -34,7 +34,9 @@ declare(strict_types=1);
 
 namespace App\Events;
 
-class {$name}
+use Veldora\Framework\Events\Event;
+
+class {$name} extends Event
 {
     /**
      * Create a new event instance.

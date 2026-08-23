@@ -38,7 +38,9 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
-class {$name}
+use Veldora\Framework\Queue\Job;
+
+class {$name} extends Job
 {
     /**
      * Create a new job instance.

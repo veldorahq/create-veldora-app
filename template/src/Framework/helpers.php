@@ -170,3 +170,78 @@ if (!function_exists('abort')) {
     }
 }
 
+if (!function_exists('app')) {
+    /**
+     * Get the available container instance or resolve a binding.
+     */
+    function app(?string $abstract = null): mixed
+    {
+        $instance = Application::getInstance();
+
+        if ($abstract === null) {
+            return $instance;
+        }
+
+        return $instance->get($abstract);
+    }
+}
+
+if (!function_exists('event')) {
+    /**
+     * Dispatch an event and call the listeners.
+     *
+     * @return array<mixed>
+     */
+    function event(string|object $event, mixed $payload = []): array
+    {
+        /** @var \Veldora\Framework\Events\EventDispatcher $dispatcher */
+        $dispatcher = app(\Veldora\Framework\Events\EventDispatcher::class);
+
+        return $dispatcher->dispatch($event, $payload);
+    }
+}
+
+if (!function_exists('queue')) {
+    /**
+     * Get the QueueManager instance or push a job.
+     */
+    function queue(?\Veldora\Framework\Queue\JobInterface $job = null, string $queue = 'default', int $delay = 0): mixed
+    {
+        /** @var \Veldora\Framework\Queue\QueueManager $manager */
+        $manager = app(\Veldora\Framework\Queue\QueueManager::class);
+
+        if ($job === null) {
+            return $manager;
+        }
+
+        return $manager->push($job, $queue, $delay);
+    }
+}
+
+if (!function_exists('dispatch')) {
+    /**
+     * Dispatch a queued job.
+     */
+    function dispatch(\Veldora\Framework\Queue\JobInterface $job): \Veldora\Framework\Queue\PendingDispatch
+    {
+        return new \Veldora\Framework\Queue\PendingDispatch($job);
+    }
+}
+
+if (!function_exists('mailer')) {
+    /**
+     * Get the Mailer instance or create a pending mail.
+     */
+    function mailer(mixed $to = null): \Veldora\Framework\Mail\Mailer|\Veldora\Framework\Mail\PendingMail
+    {
+        /** @var \Veldora\Framework\Mail\Mailer $mailer */
+        $mailer = app(\Veldora\Framework\Mail\Mailer::class);
+
+        if ($to === null) {
+            return $mailer;
+        }
+
+        return $mailer->to($to);
+    }
+}
+

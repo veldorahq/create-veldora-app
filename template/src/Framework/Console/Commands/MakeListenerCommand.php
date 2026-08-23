@@ -38,12 +38,15 @@ declare(strict_types=1);
 
 namespace App\Listeners;
 
-class {$name}
+use Veldora\Framework\Events\Event;
+use Veldora\Framework\Events\Listener;
+
+class {$name} implements Listener
 {
     /**
      * Handle the event.
      */
-    public function handle(mixed \$event): void
+    public function handle(Event \$event): void
     {
         // React to event
     }

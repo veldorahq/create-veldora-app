@@ -90,6 +90,8 @@ class Container implements ContainerInterface
             $concrete = $id;
         }
 
+        unset($this->instances[$id]);
+
         $this->bindings[$id] = [
             'concrete' => $concrete,
             'shared' => false,
@@ -105,10 +107,26 @@ class Container implements ContainerInterface
             $concrete = $id;
         }
 
+        unset($this->instances[$id]);
+
         $this->bindings[$id] = [
             'concrete' => $concrete,
             'shared' => true,
         ];
+    }
+
+    /**
+     * Register an existing instance as shared in the container.
+     */
+    public function instance(string $id, mixed $instance): mixed
+    {
+        $this->instances[$id] = $instance;
+        $this->bindings[$id] = [
+            'concrete' => $instance,
+            'shared' => true,
+        ];
+
+        return $instance;
     }
 
     /**

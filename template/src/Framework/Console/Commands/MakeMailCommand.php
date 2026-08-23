@@ -36,7 +36,9 @@ declare(strict_types=1);
 
 namespace App\Mail;
 
-class {$name}
+use Veldora\Framework\Mail\Mailable;
+
+class {$name} extends Mailable
 {
     /**
      * Create a new message instance.
@@ -48,9 +50,11 @@ class {$name}
     /**
      * Build the message.
      */
-    public function build(): string
+    public function build(): static
     {
-        return view('emails.{$viewName}', \$this->data);
+        return \$this
+            ->subject('{$name}')
+            ->view('emails.{$viewName}', \$this->data);
     }
 }
 PHP;

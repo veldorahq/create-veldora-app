@@ -94,6 +94,15 @@ final class Application extends Container
         $this->singleton(AuthManager::class, function () {
             return new AuthManager($this);
         });
+        $this->singleton(\Veldora\Framework\Events\EventDispatcher::class, function () {
+            return new \Veldora\Framework\Events\EventDispatcher($this);
+        });
+        $this->singleton(\Veldora\Framework\Queue\QueueManager::class, function () {
+            return new \Veldora\Framework\Queue\QueueManager($this);
+        });
+        $this->singleton(\Veldora\Framework\Mail\Mailer::class, function () {
+            return new \Veldora\Framework\Mail\Mailer($this);
+        });
     }
 
     /**
