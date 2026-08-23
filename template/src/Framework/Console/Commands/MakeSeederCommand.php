@@ -39,12 +39,10 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use Veldora\Framework\Database\Connection;
+use Veldora\Framework\Database\Seeder;
 
-class {$name}
+class {$name} extends Seeder
 {
-    public function __construct(protected Connection \$db) {}
-
     /**
      * Seed the database with sample data.
      */

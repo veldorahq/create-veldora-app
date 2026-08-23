@@ -22,11 +22,32 @@ class QueryBuilder
     protected array $columns = ['*'];
 
     /**
+     * The table joins.
+     *
+     * @var array<array{type: string, table: string, first: string, operator: string, second: string}>
+     */
+    protected array $joins = [];
+
+    /**
      * The where constraints.
+     *
+     * @var array<array{type: string, raw?: bool, sql?: string, column?: string, operator?: string, value?: mixed, values?: array<mixed>}>
+     */
+    protected array $wheres = [];
+
+    /**
+     * The group by columns.
+     *
+     * @var array<string>
+     */
+    protected array $groups = [];
+
+    /**
+     * The having clauses.
      *
      * @var array<array{type: string, column: string, operator: string, value: mixed}>
      */
-    protected array $wheres = [];
+    protected array $havings = [];
 
     /**
      * The order by clauses.
@@ -60,6 +81,14 @@ class QueryBuilder
     }
 
     /**
+     * Get the connection instance.
+     */
+    public function getConnection(): Connection
+    {
+        return $this->connection;
+    }
+
+    /**
      * Set the table target.
      */
     public function table(string $table): self
@@ -80,7 +109,39 @@ class QueryBuilder
     }
 
     /**
-     * Add a WHERE constraint.
+     * Add an INNER JOIN clause.
+     */
+    public function join(string $table, string $first, string $operator, string $second, string $type = 'INNER'): self
+    {
+        $this->joins[] = [
+            'type' => strtoupper($type),
+            'table' => $table,
+            'first' => $first,
+            'operator' => $operator,
+            'second' => $second,
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Add a LEFT JOIN clause.
+     */
+    public function leftJoin(string $table, string $first, string $operator, string $second): self
+    {
+        return $this->join($table, $first, $operator, $second, 'LEFT');
+    }
+
+    /**
+     * Add a RIGHT JOIN clause.
+     */
+    public function rightJoin(string $table, string $first, string $operator, string $second): self
+    {
+        return $this->join($table, $first, $operator, $second, 'RIGHT');
+    }
+
+    /**
+     * Add a basic WHERE constraint.
      */
     public function where(string $column, string $operator, mixed $value = null): self
     {
@@ -121,6 +182,186 @@ class QueryBuilder
         $this->bindings[] = $value;
 
         return $this;
+    }
+
+    /**
+     * Add a WHERE IN constraint.
+     *
+     * @param array<mixed> $values
+     */
+    public function whereIn(string $column, array $values, string $boolean = 'AND', bool $not = false): self
+    {
+        $type = strtoupper($boolean);
+        $operator = $not ? 'NOT IN' : 'IN';
+
+        if (empty($values)) {
+            // WHERE 0 = 1 if empty IN array
+            $this->wheres[] = [
+                'type' => $type,
+                'raw' => true,
+                'sql' => $not ? '1 = 1' : '0 = 1',
+            ];
+            return $this;
+        }
+
+        $this->wheres[] = [
+            'type' => $type,
+            'column' => $column,
+            'operator' => $operator,
+            'values' => array_values($values),
+        ];
+
+        foreach ($values as $val) {
+            $this->bindings[] = $val;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add a WHERE NOT IN constraint.
+     *
+     * @param array<mixed> $values
+     */
+    public function whereNotIn(string $column, array $values, string $boolean = 'AND'): self
+    {
+        return $this->whereIn($column, $values, $boolean, true);
+    }
+
+    /**
+     * Add an OR WHERE IN constraint.
+     *
+     * @param array<mixed> $values
+     */
+    public function orWhereIn(string $column, array $values): self
+    {
+        return $this->whereIn($column, $values, 'OR');
+    }
+
+    /**
+     * Add an OR WHERE NOT IN constraint.
+     *
+     * @param array<mixed> $values
+     */
+    public function orWhereNotIn(string $column, array $values): self
+    {
+        return $this->whereIn($column, $values, 'OR', true);
+    }
+
+    /**
+     * Add a WHERE NULL constraint.
+     */
+    public function whereNull(string $column, string $boolean = 'AND', bool $not = false): self
+    {
+        $type = strtoupper($boolean);
+        $operator = $not ? 'IS NOT NULL' : 'IS NULL';
+
+        $this->wheres[] = [
+            'type' => $type,
+            'column' => $column,
+            'operator' => $operator,
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Add a WHERE NOT NULL constraint.
+     */
+    public function whereNotNull(string $column, string $boolean = 'AND'): self
+    {
+        return $this->whereNull($column, $boolean, true);
+    }
+
+    /**
+     * Add an OR WHERE NULL constraint.
+     */
+    public function orWhereNull(string $column): self
+    {
+        return $this->whereNull($column, 'OR');
+    }
+
+    /**
+     * Add an OR WHERE NOT NULL constraint.
+     */
+    public function orWhereNotNull(string $column): self
+    {
+        return $this->whereNull($column, 'OR', true);
+    }
+
+    /**
+     * Add a WHERE BETWEEN constraint.
+     *
+     * @param array{0: mixed, 1: mixed} $values
+     */
+    public function whereBetween(string $column, array $values, string $boolean = 'AND', bool $not = false): self
+    {
+        $type = strtoupper($boolean);
+        $operator = $not ? 'NOT BETWEEN' : 'BETWEEN';
+
+        $this->wheres[] = [
+            'type' => $type,
+            'column' => $column,
+            'operator' => $operator,
+            'values' => [$values[0], $values[1]],
+        ];
+
+        $this->bindings[] = $values[0];
+        $this->bindings[] = $values[1];
+
+        return $this;
+    }
+
+    /**
+     * Add a WHERE NOT BETWEEN constraint.
+     *
+     * @param array{0: mixed, 1: mixed} $values
+     */
+    public function whereNotBetween(string $column, array $values, string $boolean = 'AND'): self
+    {
+        return $this->whereBetween($column, $values, $boolean, true);
+    }
+
+    /**
+     * Add a GROUP BY clause.
+     */
+    public function groupBy(string ...$columns): self
+    {
+        foreach ($columns as $column) {
+            $this->groups[] = $column;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add a HAVING clause.
+     */
+    public function having(string $column, string $operator, mixed $value = null, string $boolean = 'AND'): self
+    {
+        if ($value === null) {
+            $value = $operator;
+            $operator = '=';
+        }
+
+        $this->havings[] = [
+            'type' => strtoupper($boolean),
+            'column' => $column,
+            'operator' => $operator,
+            'value' => $value,
+        ];
+
+        $this->bindings[] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Add an OR HAVING clause.
+     */
+    public function orHaving(string $column, string $operator, mixed $value = null): self
+    {
+        return $this->having($column, $operator, $value, 'OR');
     }
 
     /**
@@ -166,8 +407,20 @@ class QueryBuilder
 
         $sql = 'SELECT ' . implode(', ', $this->columns) . ' FROM ' . $this->sanitizeName($this->table);
 
+        if (!empty($this->joins)) {
+            $sql .= ' ' . $this->compileJoins();
+        }
+
         if (!empty($this->wheres)) {
             $sql .= ' WHERE ' . $this->compileWheres();
+        }
+
+        if (!empty($this->groups)) {
+            $sql .= ' GROUP BY ' . implode(', ', array_map([$this, 'sanitizeName'], $this->groups));
+        }
+
+        if (!empty($this->havings)) {
+            $sql .= ' HAVING ' . $this->compileHavings();
         }
 
         if (!empty($this->orders)) {
@@ -186,6 +439,21 @@ class QueryBuilder
     }
 
     /**
+     * Compile JOIN clauses.
+     */
+    protected function compileJoins(): string
+    {
+        $joins = [];
+        foreach ($this->joins as $join) {
+            $table = $this->sanitizeName($join['table']);
+            $first = $this->sanitizeName($join['first']);
+            $second = $this->sanitizeName($join['second']);
+            $joins[] = "{$join['type']} JOIN {$table} ON {$first} {$join['operator']} {$second}";
+        }
+        return implode(' ', $joins);
+    }
+
+    /**
      * Compile the where constraints into SQL.
      */
     protected function compileWheres(): string
@@ -194,10 +462,41 @@ class QueryBuilder
 
         foreach ($this->wheres as $index => $where) {
             $prefix = $index === 0 ? '' : ' ' . $where['type'] . ' ';
+
+            if (!empty($where['raw'])) {
+                $sql .= $prefix . $where['sql'];
+                continue;
+            }
+
             $column = $this->sanitizeName($where['column']);
-            $sql .= $prefix . "{$column} {$where['operator']} ?";
+            $operator = $where['operator'];
+
+            if ($operator === 'IN' || $operator === 'NOT IN') {
+                $placeholders = implode(', ', array_fill(0, count($where['values'] ?? []), '?'));
+                $sql .= $prefix . "{$column} {$operator} ({$placeholders})";
+            } elseif ($operator === 'BETWEEN' || $operator === 'NOT BETWEEN') {
+                $sql .= $prefix . "{$column} {$operator} ? AND ?";
+            } elseif ($operator === 'IS NULL' || $operator === 'IS NOT NULL') {
+                $sql .= $prefix . "{$column} {$operator}";
+            } else {
+                $sql .= $prefix . "{$column} {$operator} ?";
+            }
         }
 
+        return $sql;
+    }
+
+    /**
+     * Compile the having constraints into SQL.
+     */
+    protected function compileHavings(): string
+    {
+        $sql = '';
+        foreach ($this->havings as $index => $having) {
+            $prefix = $index === 0 ? '' : ' ' . $having['type'] . ' ';
+            $column = $this->sanitizeName($having['column']);
+            $sql .= $prefix . "{$column} {$having['operator']} ?";
+        }
         return $sql;
     }
 
@@ -219,6 +518,10 @@ class QueryBuilder
      */
     protected function sanitizeName(string $name): string
     {
+        if ($name === '*' || str_contains($name, '(') || str_contains($name, ' ') || str_contains($name, 'as')) {
+            return $name;
+        }
+
         // Allow dot notation for table.column
         $parts = explode('.', $name);
         $escaped = [];
@@ -258,6 +561,135 @@ class QueryBuilder
         $results = $this->get();
 
         return $results[0] ?? null;
+    }
+
+    /**
+     * Retrieve the "count" result of the query.
+     */
+    public function count(string $columns = '*'): int
+    {
+        $previousColumns = $this->columns;
+        $this->columns = ["COUNT({$columns}) as aggregate"];
+
+        $result = $this->first();
+        $this->columns = $previousColumns;
+
+        return (int) ($result['aggregate'] ?? 0);
+    }
+
+    /**
+     * Retrieve the sum of the values of a given column.
+     */
+    public function sum(string $column): float|int
+    {
+        $previousColumns = $this->columns;
+        $this->columns = ["SUM({$column}) as aggregate"];
+
+        $result = $this->first();
+        $this->columns = $previousColumns;
+
+        return is_numeric($result['aggregate'] ?? null) ? $result['aggregate'] + 0 : 0;
+    }
+
+    /**
+     * Retrieve the average of the values of a given column.
+     */
+    public function avg(string $column): float
+    {
+        $previousColumns = $this->columns;
+        $this->columns = ["AVG({$column}) as aggregate"];
+
+        $result = $this->first();
+        $this->columns = $previousColumns;
+
+        return (float) ($result['aggregate'] ?? 0);
+    }
+
+    /**
+     * Retrieve the minimum value of a given column.
+     */
+    public function min(string $column): mixed
+    {
+        $previousColumns = $this->columns;
+        $this->columns = ["MIN({$column}) as aggregate"];
+
+        $result = $this->first();
+        $this->columns = $previousColumns;
+
+        return $result['aggregate'] ?? null;
+    }
+
+    /**
+     * Retrieve the maximum value of a given column.
+     */
+    public function max(string $column): mixed
+    {
+        $previousColumns = $this->columns;
+        $this->columns = ["MAX({$column}) as aggregate"];
+
+        $result = $this->first();
+        $this->columns = $previousColumns;
+
+        return $result['aggregate'] ?? null;
+    }
+
+    /**
+     * Determine if any rows exist for the current query.
+     */
+    public function exists(): bool
+    {
+        $previousLimit = $this->limit;
+        $this->limit = 1;
+        $results = $this->get();
+        $this->limit = $previousLimit;
+
+        return !empty($results);
+    }
+
+    /**
+     * Chunk the results of the query into smaller batches.
+     */
+    public function chunk(int $count, callable $callback): bool
+    {
+        $page = 1;
+
+        do {
+            $clone = clone $this;
+            $results = $clone->offset(($page - 1) * $count)->limit($count)->get();
+
+            $countResults = count($results);
+
+            if ($countResults === 0) {
+                break;
+            }
+
+            if ($callback($results, $page) === false) {
+                return false;
+            }
+
+            unset($results);
+            $page++;
+        } while ($countResults === $count);
+
+        return true;
+    }
+
+    /**
+     * Paginate the given query into a Paginator instance.
+     */
+    public function paginate(int $perPage = 15, ?int $page = null): Paginator
+    {
+        $page = $page ?: (isset($_GET['page']) ? (int) $_GET['page'] : 1);
+        $page = max(1, $page);
+
+        $total = (clone $this)->count();
+
+        $results = (clone $this)
+            ->offset(($page - 1) * $perPage)
+            ->limit($perPage)
+            ->get();
+
+        return new Paginator($results, $total, $perPage, $page);
     }
 
     /**

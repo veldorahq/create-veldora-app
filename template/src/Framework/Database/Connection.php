@@ -82,6 +82,14 @@ class Connection
     }
 
     /**
+     * Get a new QueryBuilder instance targeting a specific table.
+     */
+    public function table(string $table): QueryBuilder
+    {
+        return (new QueryBuilder($this))->table($table);
+    }
+
+    /**
      * Get the active database driver name.
      */
     public function getDriver(): string
