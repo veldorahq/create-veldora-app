@@ -1,6 +1,8 @@
 <div align="center">
 
-# ▲ create-veldora-app
+<img src="https://raw.githubusercontent.com/veldorahq/create-veldora-app/main/assets/v-icon.png" width="80" height="80" alt="Veldora Logo">
+
+# create-veldora-app
 
 **Scaffold modern Veldora PHP applications in seconds with zero configuration.**
 
