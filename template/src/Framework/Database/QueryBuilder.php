@@ -74,10 +74,32 @@ class QueryBuilder
     protected array $bindings = [];
 
     /**
+     * The model class to hydrate records into.
+     */
+    protected ?string $modelClass = null;
+
+    /**
      * Create a new QueryBuilder instance.
      */
     public function __construct(protected Connection $connection)
     {
+    }
+
+    /**
+     * Set the model class for hydration.
+     */
+    public function setModelClass(?string $modelClass): self
+    {
+        $this->modelClass = $modelClass;
+        return $this;
+    }
+
+    /**
+     * Get the model class.
+     */
+    public function getModelClass(): ?string
+    {
+        return $this->modelClass;
     }
 
     /**
@@ -534,7 +556,7 @@ class QueryBuilder
     /**
      * Execute the SELECT query and return results.
      *
-     * @return array<array<string, mixed>>
+     * @return array<mixed>
      */
     public function get(): array
     {
@@ -547,15 +569,19 @@ class QueryBuilder
         /** @var array<array<string, mixed>> $results */
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+        if ($this->modelClass !== null && class_exists($this->modelClass)) {
+            $class = $this->modelClass;
+            $dummy = new $class();
+            return array_map(fn ($row) => $dummy->newFromBuilder($row), $results);
+        }
+
         return $results;
     }
 
     /**
      * Execute the query and return the first result.
-     *
-     * @return array<string, mixed>|null
      */
-    public function first(): ?array
+    public function first(): mixed
     {
         $this->limit(1);
         $results = $this->get();

@@ -111,6 +111,7 @@ abstract class Model implements ArrayAccess, JsonSerializable
     public function __construct(array $attributes = [])
     {
         $this->bootIfNotBooted();
+        $this->initializeTraits();
         $this->fill($attributes);
     }
 
@@ -120,6 +121,26 @@ abstract class Model implements ArrayAccess, JsonSerializable
     protected function bootIfNotBooted(): void
     {
         static::boot();
+    }
+
+    /**
+     * Initialize any traits used by the model.
+     */
+    protected function initializeTraits(): void
+    {
+        $class = static::class;
+        $traits = [];
+        do {
+            $traits = array_merge(class_uses($class) ?: [], $traits);
+        } while ($class = get_parent_class($class));
+
+        foreach ($traits as $trait) {
+            $basename = (string) strrchr($trait, '\\');
+            $method = 'initialize' . ltrim($basename !== '' ? $basename : $trait, '\\');
+            if (method_exists($this, $method)) {
+                $this->{$method}();
+            }
+        }
     }
 
     /**
@@ -142,7 +163,14 @@ abstract class Model implements ArrayAccess, JsonSerializable
      */
     public function query(): QueryBuilder
     {
-        return (new QueryBuilder(static::getConnection()))->table($this->getTable());
+        $builder = (new QueryBuilder(static::getConnection()))
+            ->table($this->getTable())
+            ->setModelClass(static::class);
+
+        if ($this->softDelete) {
+            $builder->whereNull('deleted_at');
+        }
+        return $builder;
     }
 
     /**
@@ -444,15 +472,19 @@ abstract class Model implements ArrayAccess, JsonSerializable
     {
         $model = new static();
         
-        $attributes = $model->query()
+        $result = $model->query()
             ->where($model->primaryKey, '=', $id)
             ->first();
 
-        if ($attributes === null) {
+        if ($result === null) {
             return null;
         }
 
-        return $model->newFromBuilder($attributes);
+        if ($result instanceof static) {
+            return $result;
+        }
+
+        return $model->newFromBuilder($result);
     }
 
     /**
@@ -465,7 +497,9 @@ abstract class Model implements ArrayAccess, JsonSerializable
         $model = new static();
         $results = $model->query()->get();
 
-        return array_map(fn ($row) => $model->newFromBuilder($row), $results);
+        return array_map(function ($row) use ($model) {
+            return $row instanceof static ? $row : $model->newFromBuilder($row);
+        }, $results);
     }
 
     /**
@@ -724,6 +758,16 @@ abstract class Model implements ArrayAccess, JsonSerializable
     public static function deleted(callable $callback): void
     {
         static::registerModelEvent('deleted', $callback);
+    }
+
+    public static function restoring(callable $callback): void
+    {
+        static::registerModelEvent('restoring', $callback);
+    }
+
+    public static function restored(callable $callback): void
+    {
+        static::registerModelEvent('restored', $callback);
     }
 
     /**

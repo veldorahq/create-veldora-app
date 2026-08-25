@@ -28,13 +28,11 @@ class AddComponentCommand extends Command
             ->addArgument('components', InputArgument::IS_ARRAY | InputArgument::OPTIONAL, 'Component name(s) to add');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function executeDirect(array $components = []): void
     {
-        $components = $input->getArgument('components');
-
         if (empty($components)) {
-            $this->printUsage($output);
-            return Command::SUCCESS;
+            echo "  Usage: php veldora add <component-name>\n";
+            return;
         }
 
         $registry    = $this->buildRegistry();
@@ -46,14 +44,14 @@ class AddComponentCommand extends Command
             $name = strtolower(trim($name));
 
             if (!isset($registry[$name])) {
-                $output->writeln("  <fg=red>✗</> Component <comment>[{$name}]</comment> not found. Available: " . implode(', ', $available));
+                echo "  \033[31m✗\033[0m Component [{$name}] not found. Available: " . implode(', ', $available) . "\n";
                 continue;
             }
 
             $dest = $this->projectRoot . '/resources/views/components/' . $name . '.veldora.php';
 
             if (file_exists($dest)) {
-                $output->writeln("  <fg=yellow>!</> Component <comment>[{$name}]</comment> already exists — skipped.");
+                echo "  \033[33m!\033[0m Component [{$name}] already exists — skipped.\n";
                 $skipped++;
                 continue;
             }
@@ -65,21 +63,20 @@ class AddComponentCommand extends Command
 
             file_put_contents($dest, $registry[$name]['template']);
 
-            $output->writeln("  <fg=green>✓</> Added <comment>[{$name}]</comment> → <info>resources/views/components/{$name}.veldora.php</info>");
+            echo "  \033[32m✓\033[0m Added [{$name}] → resources/views/components/{$name}.veldora.php\n";
             if (!empty($registry[$name]['usage'])) {
-                $output->writeln("      Usage: <fg=gray>{$registry[$name]['usage']}</>");
+                echo "      \033[90mUsage: {$registry[$name]['usage']}\033[0m\n";
             }
             $installed++;
         }
 
-        $output->writeln('');
-        if ($installed > 0) {
-            $output->writeln("  <fg=green>Done.</> {$installed} component(s) installed. Include <info>veldora-ui.css</info> in your layout.");
-        }
-        if ($skipped > 0) {
-            $output->writeln("  <fg=yellow>{$skipped} component(s) skipped</> (already exist).");
-        }
+        echo "\n  \033[32mDone.\033[0m Installed: {$installed}, Skipped: {$skipped}\n\n";
+    }
 
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $components = $input->getArgument('components');
+        $this->executeDirect((array) $components);
         return Command::SUCCESS;
     }
 

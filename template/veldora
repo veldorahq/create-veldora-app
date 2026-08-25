@@ -105,7 +105,7 @@ switch ($command) {
                 $host = substr($arg, 7);
             }
         }
-        echo "\n\033[35m\033[1m  ▲ Veldora Development Server\033[0m \033[90mv0.4.0\033[0m\n\n";
+        echo "\n\033[35m\033[1m  ▲ Veldora Development Server\033[0m \033[90mv0.5.0\033[0m\n\n";
         echo "  \033[90mServer running on:\033[0m   \033[36m\033[1mhttp://{$host}:{$port}\033[0m\n";
         echo "  \033[90mEnvironment:\033[0m         \033[32mlocal\033[0m\n";
         echo "  \033[90mPress \033[33m\033[1mCtrl+C\033[0m\033[90m to stop the server.\033[0m\n\n";
@@ -396,55 +396,64 @@ switch ($command) {
         exit(0);
 
     case 'make:auth':
-        if (class_exists(Symfony\Component\Console\Application::class)) {
-            $cmd = new Veldora\Framework\Console\Commands\MakeAuthCommand();
-        } else {
-            echo "\033[32m✔ Scaffolding Authentication Layer...\033[0m\n";
-        }
-        break;
+        (new Veldora\Framework\Console\Commands\MakeAuthCommand())->executeDirect();
+        exit(0);
 
     case 'migrate':
-        if (class_exists(Symfony\Component\Console\Application::class)) {
-            $cmd = new Veldora\Framework\Console\Commands\MigrateCommand();
-        }
-        break;
+        (new Veldora\Framework\Console\Commands\MigrateCommand())->executeDirect();
+        exit(0);
 
     case 'migrate:rollback':
-        if (class_exists(Symfony\Component\Console\Application::class)) {
-            $cmd = new Veldora\Framework\Console\Commands\RollbackCommand();
-        }
-        break;
+        (new Veldora\Framework\Console\Commands\RollbackCommand())->executeDirect();
+        exit(0);
 
     case 'migrate:fresh':
-        if (class_exists(Symfony\Component\Console\Application::class)) {
-            $cmd = new Veldora\Framework\Console\Commands\FreshCommand();
-        }
-        break;
+        (new Veldora\Framework\Console\Commands\FreshCommand())->executeDirect();
+        exit(0);
 
     case 'ui:list':
-        (new Veldora\Framework\Console\Commands\ListComponentsCommand())->run(
-            new Symfony\Component\Console\Input\ArrayInput([]),
-            new Symfony\Component\Console\Output\ConsoleOutput()
-        );
+        (new Veldora\Framework\Console\Commands\ListComponentsCommand())->executeDirect();
         exit(0);
 
     case 'add':
         $components = array_slice($args, 1);
         if (empty($components)) {
-            fwrite(STDERR, "\033[31mError:\033[0m Please specify components to add (e.g. php veldora add button card modal)\n");
+            fwrite(STDERR, "\033[31mError:\033[0m Please specify components to add (e.g. php veldora add button card modal footer rating)\n");
             exit(1);
         }
-        (new Veldora\Framework\Console\Commands\AddComponentCommand())->run(
-            new Symfony\Component\Console\Input\ArrayInput(['components' => $components]),
-            new Symfony\Component\Console\Output\ConsoleOutput()
-        );
+        (new Veldora\Framework\Console\Commands\AddComponentCommand())->executeDirect($components);
+        exit(0);
+
+    case 'down':
+        $secret = null;
+        foreach ($args as $arg) {
+            if (str_starts_with($arg, '--secret=')) {
+                $secret = substr($arg, 9);
+            }
+        }
+        $downFile = $app->storagePath('framework/down');
+        $dir = dirname($downFile);
+        if (!is_dir($dir)) mkdir($dir, 0755, true);
+        file_put_contents($downFile, json_encode(['down_at' => date('Y-m-d H:i:s'), 'secret' => $secret], JSON_PRETTY_PRINT));
+        echo "\033[33m  Application is now in maintenance mode.\033[0m\n";
+        if ($secret) echo "  Bypass via: \033[32m?secret={$secret}\033[0m\n";
+        exit(0);
+
+    case 'up':
+        $downFile = $app->storagePath('framework/down');
+        if (file_exists($downFile)) {
+            unlink($downFile);
+            echo "\033[32m  Application is now live.\033[0m\n";
+        } else {
+            echo "\033[90m  Application is already live.\033[0m\n";
+        }
         exit(0);
 
     case 'help':
     case '--help':
     case '-h':
     default:
-        echo "\n\033[35m\033[1m  ▲ Veldora CLI\033[0m \033[90mv0.4.0\033[0m\n";
+        echo "\n\033[35m\033[1m  ▲ Veldora CLI\033[0m \033[90mv0.5.0\033[0m\n";
         echo "\033[90m  The modern PHP framework you actually own. 40+ Built-in Commands.\033[0m\n\n";
         echo "  \033[1mUsage:\033[0m\n";
         echo "    $ \033[36mphp veldora\033[0m \033[97m<command> [options]\033[0m\n\n";
@@ -457,7 +466,9 @@ switch ($command) {
         echo "    \033[35mstorage:link\033[0m       \033[90mCreate symlink from public/storage to storage/app/public\033[0m\n";
         echo "    \033[35menv\033[0m                \033[90mDisplay current application environment\033[0m\n";
         echo "    \033[35menv:encrypt\033[0m        \033[90mEncrypt .env file using APP_KEY for safe deployment\033[0m\n";
-        echo "    \033[35menv:decrypt\033[0m        \033[90mDecrypt .env.encrypted file using APP_KEY\033[0m\n\n";
+        echo "    \033[35menv:decrypt\033[0m        \033[90mDecrypt .env.encrypted file using APP_KEY\033[0m\n";
+        echo "    \033[35mdown\033[0m               \033[90mPut the application into maintenance mode\033[0m\n";
+        echo "    \033[35mup\033[0m                 \033[90mBring the application out of maintenance mode\033[0m\n\n";
 
         echo "  \033[1;36mCode Generators (make:*)\033[0m\n";
         echo "    \033[35mmake:controller\033[0m    \033[90mCreate a new HTTP Controller class\033[0m\n";
@@ -499,7 +510,7 @@ switch ($command) {
         echo "    \033[36mcache:clear\033[0m        \033[90mFlush the application and session cache\033[0m\n\n";
 
         echo "  \033[1;36mUI Components\033[0m\n";
-        echo "    \033[32mui:list\033[0m            \033[90mList all 21 available Veldora UI components\033[0m\n";
+        echo "    \033[32mui:list\033[0m            \033[90mList all available Veldora UI components\033[0m\n";
         echo "    \033[32madd [components]\033[0m   \033[90mAdd UI components into resources/views/components/\033[0m\n\n";
 
         echo "  \033[90mDocumentation: https://veldora.modrao.com • Author: Shahriyar Fahim\033[0m\n\n";
@@ -508,7 +519,7 @@ switch ($command) {
 
 // If Symfony Console is available, run through Symfony application
 if (class_exists(Symfony\Component\Console\Application::class)) {
-    $console = new Symfony\Component\Console\Application('Veldora', '0.4.0');
+    $console = new Symfony\Component\Console\Application('Veldora', '0.5.0');
     $console->add(new Veldora\Framework\Console\Commands\AboutCommand());
     $console->add(new Veldora\Framework\Console\Commands\DoctorCommand());
     $console->add(new Veldora\Framework\Console\Commands\KeyGenerateCommand());
@@ -555,6 +566,8 @@ if (class_exists(Symfony\Component\Console\Application::class)) {
     $console->add(new Veldora\Framework\Console\Commands\QueueFailedCommand());
     $console->add(new Veldora\Framework\Console\Commands\QueueRetryCommand());
     $console->add(new Veldora\Framework\Console\Commands\QueueClearCommand());
+    $console->add(new Veldora\Framework\Console\Commands\DownCommand());
+    $console->add(new Veldora\Framework\Console\Commands\UpCommand());
     $console->run();
     exit(0);
 }

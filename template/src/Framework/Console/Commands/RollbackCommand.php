@@ -21,7 +21,7 @@ class RollbackCommand extends Command
             ->setDescription('Rollback the last database migration');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function executeDirect(): void
     {
         $app = Application::getInstance();
         
@@ -29,19 +29,24 @@ class RollbackCommand extends Command
         $migrator = $app->get(Migrator::class);
         $migrationDir = $app->basePath('database/migrations');
 
-        $output->writeln('<info>Rolling back migrations...</info>');
+        echo "\n\033[36mRolling back migrations...\033[0m\n";
 
         $rolledBack = $migrator->rollback($migrationDir);
 
         if (empty($rolledBack)) {
-            $output->writeln('<comment>Nothing to rollback.</comment>');
-            return Command::SUCCESS;
+            echo "  \033[90mNothing to rollback.\033[0m\n\n";
+            return;
         }
 
         foreach ($rolledBack as $migration) {
-            $output->writeln("<info>Rolled back:</info> {$migration}");
+            echo "  \033[33mRolled back:\033[0m {$migration}\n";
         }
+        echo "\n";
+    }
 
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $this->executeDirect();
         return Command::SUCCESS;
     }
 }

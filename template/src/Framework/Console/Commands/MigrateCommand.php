@@ -21,7 +21,7 @@ class MigrateCommand extends Command
             ->setDescription('Run the database migrations');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function executeDirect(): void
     {
         $app = Application::getInstance();
         
@@ -29,19 +29,24 @@ class MigrateCommand extends Command
         $migrator = $app->get(Migrator::class);
         $migrationDir = $app->basePath('database/migrations');
 
-        $output->writeln('<info>Running migrations...</info>');
+        echo "\n\033[36mRunning migrations...\033[0m\n";
 
         $ran = $migrator->run($migrationDir);
 
         if (empty($ran)) {
-            $output->writeln('<comment>Nothing to migrate.</comment>');
-            return Command::SUCCESS;
+            echo "  \033[90mNothing to migrate.\033[0m\n\n";
+            return;
         }
 
         foreach ($ran as $migration) {
-            $output->writeln("<info>Migrated:</info> {$migration}");
+            echo "  \033[32m✔ Migrated:\033[0m {$migration}\n";
         }
+        echo "\n";
+    }
 
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $this->executeDirect();
         return Command::SUCCESS;
     }
 }

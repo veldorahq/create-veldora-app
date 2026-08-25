@@ -101,6 +101,56 @@ class Request
     }
 
     /**
+     * Create a Request object from explicit parameters.
+     *
+     * @param array<string, mixed> $parameters
+     * @param array<string, string> $cookies
+     * @param array<string, mixed> $files
+     * @param array<string, mixed> $server
+     */
+    public static function create(
+        string $method,
+        string $uri,
+        array $parameters = [],
+        array $cookies = [],
+        array $files = [],
+        array $server = [],
+        ?string $content = null
+    ): self {
+        $parsedUrl = parse_url($uri);
+        $path = $parsedUrl['path'] ?? '/';
+        $queryString = $parsedUrl['query'] ?? '';
+
+        $query = [];
+        if ($queryString !== '') {
+            parse_str($queryString, $query);
+        }
+
+        $request = [];
+        if (in_array(strtoupper($method), ['POST', 'PUT', 'PATCH', 'DELETE'], true)) {
+            $request = $parameters;
+        } else {
+            $query = array_merge($query, $parameters);
+        }
+
+        $server = array_merge([
+            'REQUEST_METHOD' => strtoupper($method),
+            'REQUEST_URI'    => $uri,
+            'PATH_INFO'      => $path,
+            'REMOTE_ADDR'    => '127.0.0.1',
+            'SERVER_NAME'    => 'localhost',
+            'SERVER_PORT'    => '8000',
+            'HTTP_HOST'      => 'localhost',
+        ], $server);
+
+        $instance = new self($query, $request, $cookies, $files, $server);
+        if ($content !== null) {
+            $instance->rawBody = $content;
+        }
+        return $instance;
+    }
+
+    /**
      * Parse headers from server variables.
      *
      * @param array<string, mixed> $server
@@ -169,6 +219,17 @@ class Request
         }
 
         return $method;
+    }
+
+    /**
+     * Retrieve a value from the request query string ($_GET).
+     */
+    public function query(?string $key = null, mixed $default = null): mixed
+    {
+        if ($key === null) {
+            return $this->query;
+        }
+        return $this->query[$key] ?? $default;
     }
 
     /**

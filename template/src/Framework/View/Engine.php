@@ -72,6 +72,48 @@ class Engine
     }
 
     /**
+     * Render an explicit view template file path.
+     *
+     * @param array<string, mixed> $data
+     */
+    public function renderFile(string $filePath, array $data = []): string
+    {
+        $compiledFile = $this->compileIfNeeded($filePath);
+
+        ob_start();
+        $this->evaluatePath($compiledFile, $data);
+        $output = ob_get_clean();
+
+        return $output !== false ? $output : '';
+    }
+
+    /**
+     * Compile and render raw Veldora template string.
+     *
+     * @param array<string, mixed> $data
+     */
+    public function renderString(string $template, array $data = []): string
+    {
+        $compiled = $this->compiler->compile($template);
+        
+        $tempFile = $this->cachePath . '/' . md5($template) . '.php';
+        if (!is_dir($this->cachePath)) {
+            mkdir($this->cachePath, 0755, true);
+        }
+        file_put_contents($tempFile, $compiled);
+
+        ob_start();
+        $this->evaluatePath($tempFile, $data);
+        $output = ob_get_clean();
+
+        if (file_exists($tempFile)) {
+            unlink($tempFile);
+        }
+
+        return $output !== false ? $output : '';
+    }
+
+    /**
      * Internal view rendering routine with layout isolation.
      *
      * @param array<string, mixed> $data

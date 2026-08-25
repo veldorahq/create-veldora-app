@@ -245,7 +245,13 @@ class Blueprint
 
         $defaultSql = '';
         if ($column['default'] !== null) {
-            $defaultSql = ' DEFAULT ' . (is_string($column['default']) ? "'{$column['default']}'" : $column['default']);
+            if (is_bool($column['default'])) {
+                $defaultSql = ' DEFAULT ' . ($column['default'] ? '1' : '0');
+            } elseif (is_string($column['default'])) {
+                $defaultSql = " DEFAULT '{$column['default']}'";
+            } else {
+                $defaultSql = ' DEFAULT ' . $column['default'];
+            }
         } elseif ($column['nullable'] && in_array($column['type'], ['timestamp', 'string', 'text', 'boolean', 'integer'], true)) {
             $defaultSql = ' DEFAULT NULL';
         }

@@ -397,3 +397,31 @@ if (!function_exists('app_path')) {
         return app()->basePath('app' . ($path ? DIRECTORY_SEPARATOR . ltrim($path, DIRECTORY_SEPARATOR) : ''));
     }
 }
+
+// ─── Routing Helpers ────────────────────────────────────────────────────────
+
+if (!function_exists('route')) {
+    /**
+     * Generate a URL for a named route with optional parameter substitution.
+     *
+     * @param array<string, mixed> $parameters
+     */
+    function route(string $name, array $parameters = []): string
+    {
+        /** @var \Veldora\Framework\Http\Router $router */
+        $router = app(\Veldora\Framework\Http\Router::class);
+        return $router->url($name, $parameters);
+    }
+}
+
+// ─── Database Helpers ───────────────────────────────────────────────────────
+
+if (!function_exists('db')) {
+    /**
+     * Get the DB facade for raw queries and transactions.
+     */
+    function db(): \Veldora\Framework\Database\DB
+    {
+        return new \Veldora\Framework\Database\DB();
+    }
+}

@@ -6,7 +6,7 @@ use Veldora\Framework\Database\Schema\Blueprint;
 use Veldora\Framework\Database\Schema\Migration;
 use Veldora\Framework\Database\Schema\Schema;
 
-class CreateUsersTable extends Migration
+return new class extends Migration
 {
     public function up(): void
     {
@@ -16,7 +16,7 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->boolean('is_admin')->default(0);
+            $table->boolean('is_admin')->default(false);
             $table->rememberToken();
             $table->timestamps();
         });
@@ -26,4 +26,4 @@ class CreateUsersTable extends Migration
     {
         Schema::dropIfExists('users');
     }
-}
+};

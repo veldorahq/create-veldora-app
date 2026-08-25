@@ -49,6 +49,12 @@ class Compiler
             $content
         );
 
+        // @method('PUT') / @method('DELETE') / @method('PATCH')
+        $content = (string) preg_replace_callback('/@method\s*\((.*?)\)/s', function (array $matches) {
+            $val = trim($matches[1], "'\" ");
+            return "<?php echo '<input type=\"hidden\" name=\"_method\" value=\"' . strtoupper('{$val}') . '\">'; ?>";
+        }, $content);
+
         // @auth / @endauth
         $content = (string) preg_replace('/@auth/', '<?php if(auth()->check()): ?>', $content);
         $content = (string) preg_replace('/@endauth/', '<?php endif; ?>', $content);

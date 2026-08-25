@@ -223,6 +223,28 @@ class Router
     }
 
     /**
+     * Generate a URL for a named route with optional parameter substitution.
+     *
+     * @param array<string, mixed> $parameters
+     */
+    public function url(string $name, array $parameters = []): string
+    {
+        foreach ($this->routes as $route) {
+            if ($route->getName() === $name) {
+                $uri = $route->getUri();
+                foreach ($parameters as $key => $value) {
+                    $uri = str_replace(['{' . $key . '}', '{' . $key . '?}'], (string) $value, $uri);
+                }
+                // Remove any unresolved optional parameters
+                $uri = preg_replace('/\/\{[a-zA-Z0-9_]+\?\}/', '', $uri) ?? $uri;
+                return $uri;
+            }
+        }
+
+        throw new \InvalidArgumentException("Route [{$name}] not defined.");
+    }
+
+    /**
      * Dispatch the request through the router and return a response.
      */
     public function dispatch(Request $request): Response

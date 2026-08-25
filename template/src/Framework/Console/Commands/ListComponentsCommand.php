@@ -26,40 +26,29 @@ class ListComponentsCommand extends Command
             ->setDescription('List all available Veldora UI components');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function executeDirect(): void
     {
         $registry = $this->buildRegistry();
 
         if (empty($registry)) {
-            $output->writeln('<error>Could not load component registry. Is veldora/ui installed?</error>');
-            return Command::FAILURE;
+            echo "\033[31mCould not load component registry. Is veldora/ui installed?\033[0m\n";
+            return;
         }
 
-        $output->writeln('');
-        $output->writeln('  <fg=magenta;options=bold>Veldora UI — Available Components</>');
-        $output->writeln('  ' . str_repeat('─', 52));
-
-        $table = new Table($output);
-        $table->setStyle('compact');
-        $table->setHeaders(['  Component', 'Description', 'Usage']);
+        echo "\n\033[35m\033[1m  ▲ Veldora UI — Available Components\033[0m\n";
+        echo "  " . str_repeat('─', 65) . "\n";
 
         $viewsDir = $this->projectRoot . '/resources/views/components';
         foreach ($registry as $name => $meta) {
             $installed = file_exists($viewsDir . '/' . $name . '.veldora.php')
-                ? '<fg=green>✓ installed</>'
-                : '<fg=gray>not added</>';
+                ? "\033[32minstalled\033[0m"
+                : "\033[90mnot added\033[0m";
 
-            $table->addRow([
-                "  <comment>{$name}</comment>",
-                $meta['description'],
-                "<fg=gray>php veldora add {$name}</>",
-            ]);
+            $namePad = str_pad($name, 14);
+            $descPad = str_pad($meta['description'], 40);
+            echo "  \033[36m{$namePad}\033[0m \033[97m{$descPad}\033[0m  {$installed}\n";
         }
 
-        $table->render();
-        $output->writeln('');
-
-        $viewsDir = $this->projectRoot . '/resources/views/components';
         $installedCount = 0;
         foreach (array_keys($registry) as $name) {
             if (file_exists($viewsDir . '/' . $name . '.veldora.php')) {
@@ -68,10 +57,13 @@ class ListComponentsCommand extends Command
         }
 
         $total = count($registry);
-        $output->writeln("  <fg=gray>{$installedCount}/{$total} components installed in this project.</>");
-        $output->writeln('  Run <info>php veldora add <component></info> to install.');
-        $output->writeln('');
+        echo "\n  \033[90m{$installedCount}/{$total} components installed in this project.\033[0m\n";
+        echo "  Run \033[33mphp veldora add <component>\033[0m to install.\n\n";
+    }
 
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $this->executeDirect();
         return Command::SUCCESS;
     }
 

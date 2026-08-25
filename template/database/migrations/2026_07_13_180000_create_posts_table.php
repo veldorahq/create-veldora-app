@@ -6,7 +6,7 @@ use Veldora\Framework\Database\Schema\Blueprint;
 use Veldora\Framework\Database\Schema\Migration;
 use Veldora\Framework\Database\Schema\Schema;
 
-class CreatePostsTable extends Migration
+return new class extends Migration
 {
     public function up(): void
     {
@@ -22,4 +22,4 @@ class CreatePostsTable extends Migration
     {
         Schema::dropIfExists('posts');
     }
-}
+};

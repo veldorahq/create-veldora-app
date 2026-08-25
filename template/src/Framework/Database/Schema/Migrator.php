@@ -41,7 +41,14 @@ class Migrator
 
         foreach ($pending as $migrationName) {
             $file = $files[$migrationName];
-            require_once $file;
+            $instance = require $file;
+
+            if ($instance instanceof Migration) {
+                $instance->up();
+                $this->logMigration($migrationName, $batch);
+                $ran[] = $migrationName;
+                continue;
+            }
 
             $className = $this->resolveClassName($migrationName);
             
@@ -78,7 +85,14 @@ class Migrator
         foreach ($lastBatch as $migrationRecord) {
             $migrationName = $migrationRecord['migration'];
             if (isset($files[$migrationName])) {
-                require_once $files[$migrationName];
+                $instance = require $files[$migrationName];
+
+                if ($instance instanceof Migration) {
+                    $instance->down();
+                    $this->deleteMigrationRecord($migrationName);
+                    $rolledBack[] = $migrationName;
+                    continue;
+                }
 
                 $className = $this->resolveClassName($migrationName);
                 if (class_exists($className)) {

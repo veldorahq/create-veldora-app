@@ -83,6 +83,9 @@ class ComponentRegistry
             'stepper'     => $this->stepper(),
             'sidebar'     => $this->sidebar(),
             'container'   => $this->container(),
+            // ── New in 0.5.0 ───────────────────────────────────────────────
+            'footer'      => $this->footer(),
+            'rating'      => $this->rating(),
         ];
     }
 
@@ -1817,6 +1820,107 @@ $cls = 'vui-container ' . ($sizeMap[$size] ?? $sizeMap['lg']) . ($center ? ' vui
 <div class="<?= $cls ?>">
     <?= $slot ?? '' ?>
 </div>
+TEMPLATE,
+        ];
+    }
+
+    /**
+     * @return array{description: string, usage: string, template: string}
+     */
+    private function footer(): array
+    {
+        return [
+            'description' => 'Responsive site footer with branding, links, and legal text',
+            'usage'       => '<x-footer brand="My App" tagline="Built with Veldora"></x-footer>',
+            'template'    => <<<'TEMPLATE'
+<?php
+// Veldora UI — Footer Component
+// Props: brand (string), tagline (string), links (array), legal (string)
+$brand   = $brand   ?? config('app.name', 'My App');
+$tagline = $tagline ?? 'The PHP framework you actually own.';
+$legal   = $legal   ?? '&copy; ' . date('Y') . ' ' . htmlspecialchars($brand) . '. All rights reserved.';
+$links   = $links   ?? [
+    ['label' => 'Home',      'url' => '/'],
+    ['label' => 'About',     'url' => '/about'],
+    ['label' => 'Privacy',   'url' => '/privacy'],
+    ['label' => 'Contact',   'url' => '/contact'],
+];
+?>
+<style>
+.vui-footer{background:var(--vui-surface,#18181b);border-top:1px solid var(--vui-border,#27272a);padding:3rem 1.5rem 1.5rem;color:var(--vui-muted,#a1a1aa);font-family:inherit}
+.vui-footer-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr auto;gap:2rem;align-items:start}
+.vui-footer-brand h3{margin:0 0 .35rem;font-size:1.125rem;font-weight:700;background:linear-gradient(135deg,#8b5cf6,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.vui-footer-brand p{margin:0;font-size:.85rem}
+.vui-footer-links{display:flex;flex-wrap:wrap;gap:.5rem 1.5rem;justify-content:flex-end}
+.vui-footer-links a{color:var(--vui-muted,#a1a1aa);text-decoration:none;font-size:.9rem;transition:color .2s}
+.vui-footer-links a:hover{color:#fff}
+.vui-footer-legal{border-top:1px solid var(--vui-border,#27272a);margin-top:2rem;padding-top:1.25rem;text-align:center;font-size:.8rem}
+@media(max-width:640px){.vui-footer-inner{grid-template-columns:1fr}.vui-footer-links{justify-content:flex-start}}
+</style>
+<footer class="vui-footer" role="contentinfo">
+    <div class="vui-footer-inner">
+        <div class="vui-footer-brand">
+            <h3><?= htmlspecialchars($brand) ?></h3>
+            <p><?= htmlspecialchars($tagline) ?></p>
+        </div>
+        <nav class="vui-footer-links" aria-label="Footer navigation">
+            <?php foreach ($links as $link): ?>
+                <a href="<?= htmlspecialchars($link['url'] ?? '#') ?>"><?= htmlspecialchars($link['label'] ?? '') ?></a>
+            <?php endforeach; ?>
+        </nav>
+    </div>
+    <div class="vui-footer-legal"><?= $legal ?></div>
+</footer>
+TEMPLATE,
+        ];
+    }
+
+    /**
+     * @return array{description: string, usage: string, template: string}
+     */
+    private function rating(): array
+    {
+        return [
+            'description' => 'Interactive star rating component with half-star and read-only support',
+            'usage'       => '<x-rating name="score" value="3" max="5"></x-rating>',
+            'template'    => <<<'TEMPLATE'
+<?php
+// Veldora UI — Rating Component
+// Props: name (string), value (int|float), max (int), readonly (bool), size (sm|md|lg), color (string)
+$name     = $name     ?? 'rating';
+$value    = (float)  ($value    ?? 0);
+$max      = (int)    ($max      ?? 5);
+$readonly = isset($readonly) ? !empty($readonly) : false;
+$size     = $size     ?? 'md';
+$color    = $color    ?? '#f59e0b';
+$id       = 'vui-rating-' . substr(md5($name . uniqid()), 0, 8);
+$sizes    = ['sm' => '1rem', 'md' => '1.5rem', 'lg' => '2rem'];
+$starSize = $sizes[$size] ?? $sizes['md'];
+?>
+<style>
+.vui-rating{display:inline-flex;flex-direction:row-reverse;gap:.15rem;align-items:center}
+.vui-rating input{display:none}
+.vui-rating label{cursor:pointer;font-size:<?= $starSize ?>;color:#3f3f46;transition:color .15s,transform .1s}
+.vui-rating label:hover,.vui-rating label:hover~label,.vui-rating input:checked~label{color:<?= htmlspecialchars($color) ?>}
+.vui-rating label:hover{transform:scale(1.15)}
+.vui-rating-readonly .vui-rating label{cursor:default;pointer-events:none}
+.vui-rating-value{font-size:.85rem;margin-left:.5rem;color:var(--vui-muted,#a1a1aa)}
+</style>
+<?php if ($readonly): ?>
+<span class="vui-rating vui-rating-readonly" role="img" aria-label="Rating: <?= $value ?> out of <?= $max ?> stars">
+    <?php for ($i = $max; $i >= 1; $i--): ?>
+        <label aria-hidden="true" style="color:<?= $i <= $value ? htmlspecialchars($color) : '#3f3f46' ?>">&#9733;</label>
+    <?php endfor; ?>
+</span>
+<?php else: ?>
+<span class="vui-rating" id="<?= $id ?>" role="radiogroup" aria-label="Star rating">
+    <?php for ($i = $max; $i >= 1; $i--): ?>
+        <input type="radio" id="<?= $id ?>-<?= $i ?>" name="<?= htmlspecialchars($name) ?>" value="<?= $i ?>"
+               <?= $i === (int) $value ? 'checked' : '' ?>>
+        <label for="<?= $id ?>-<?= $i ?>" title="<?= $i ?> star<?= $i !== 1 ? 's' : '' ?>">&#9733;</label>
+    <?php endfor; ?>
+</span>
+<?php endif; ?>
 TEMPLATE,
         ];
     }
