@@ -185,20 +185,34 @@ async function main() {
     const replacements = {
         '{{APP_NAME}}': projectName,
         'veldora/app': `${projectName}/app`,
-        'APP_NAME=Veldora': `APP_NAME="${projectName}"`,
-        'APP_KEY=': `APP_KEY=${appKey}`,
     };
 
     copyRecursiveSync(templateDir, projectPath, replacements);
 
-    // 2. Ensure .env exists from .env.example with secure random key
+    // 2. Ensure both .env and .env.example exist with correct configuration
     const envPath = path.join(projectPath, '.env');
     const envExamplePath = path.join(projectPath, '.env.example');
+
+    // Base template content from .env.example or .env
+    let baseEnvContent = '';
     if (fs.existsSync(envExamplePath)) {
-        let envContent = fs.readFileSync(envExamplePath, 'utf-8');
+        baseEnvContent = fs.readFileSync(envExamplePath, 'utf-8');
+    } else if (fs.existsSync(envPath)) {
+        baseEnvContent = fs.readFileSync(envPath, 'utf-8');
+    }
+
+    if (baseEnvContent) {
+        // Write .env with generated APP_KEY and APP_NAME
+        let envContent = baseEnvContent;
         envContent = envContent.replace(/APP_NAME\s*=.*/g, `APP_NAME="${projectName}"`);
-        envContent = envContent.replace(/APP_KEY\s*=.*/g, `APP_KEY="${appKey}"`);
+        envContent = envContent.replace(/APP_KEY\s*=.*/g, `APP_KEY=${appKey}`);
         fs.writeFileSync(envPath, envContent, 'utf-8');
+
+        // Write .env.example with empty APP_KEY
+        let exampleContent = baseEnvContent;
+        exampleContent = exampleContent.replace(/APP_NAME\s*=.*/g, `APP_NAME="${projectName}"`);
+        exampleContent = exampleContent.replace(/APP_KEY\s*=.*/g, 'APP_KEY=');
+        fs.writeFileSync(envExamplePath, exampleContent, 'utf-8');
     }
 
     // 3. Ensure storage subdirectories and .gitkeeps
