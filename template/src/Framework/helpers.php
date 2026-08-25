@@ -326,4 +326,74 @@ if (!function_exists('log_error')) {
     }
 }
 
+// ─── Path Helpers ───────────────────────────────────────────────────────────
 
+if (!function_exists('base_path')) {
+    /**
+     * Get the absolute path to the project root, with optional sub-path appended.
+     */
+    function base_path(string $path = ''): string
+    {
+        return app()->basePath($path);
+    }
+}
+
+if (!function_exists('storage_path')) {
+    /**
+     * Get the absolute path to the storage directory, with optional sub-path appended.
+     */
+    function storage_path(string $path = ''): string
+    {
+        return app()->storagePath($path);
+    }
+}
+
+if (!function_exists('public_path')) {
+    /**
+     * Get the absolute path to the public directory, with optional sub-path appended.
+     */
+    function public_path(string $path = ''): string
+    {
+        return app()->publicPath($path);
+    }
+}
+
+if (!function_exists('resource_path')) {
+    /**
+     * Get the absolute path to the resources directory, with optional sub-path appended.
+     */
+    function resource_path(string $path = ''): string
+    {
+        return app()->basePath('resources' . ($path ? DIRECTORY_SEPARATOR . ltrim($path, DIRECTORY_SEPARATOR) : ''));
+    }
+}
+
+if (!function_exists('database_path')) {
+    /**
+     * Get the absolute path to the database directory, with optional sub-path appended.
+     */
+    function database_path(string $path = ''): string
+    {
+        return app()->basePath('database' . ($path ? DIRECTORY_SEPARATOR . ltrim($path, DIRECTORY_SEPARATOR) : ''));
+    }
+}
+
+if (!function_exists('config_path')) {
+    /**
+     * Get the absolute path to the config directory, with optional sub-path appended.
+     */
+    function config_path(string $path = ''): string
+    {
+        return app()->configPath($path);
+    }
+}
+
+if (!function_exists('app_path')) {
+    /**
+     * Get the absolute path to the app directory, with optional sub-path appended.
+     */
+    function app_path(string $path = ''): string
+    {
+        return app()->basePath('app' . ($path ? DIRECTORY_SEPARATOR . ltrim($path, DIRECTORY_SEPARATOR) : ''));
+    }
+}

@@ -85,8 +85,8 @@ function generateAppKey() {
 
 async function main() {
     console.log();
-    console.log(`${purple}${bold}  ▲ Veldora Framework${reset} ${dim}v0.4.0-beta.6${reset}`);
-    console.log(`${dim}  The modern PHP framework you actually own.${reset}`);
+    console.log(`${purple}${bold}  ▲ Veldora Framework${reset} ${dim}v0.4.0-beta.13${reset}`);
+    console.log(`${dim}  PHP 8.2+ MVC framework — routing, auth, ORM, CLI, queues, mail, UI components.${reset}`);
     console.log();
 
     const args = process.argv.slice(2);
@@ -145,7 +145,7 @@ async function main() {
         firstArg === '-v' ||
         firstArg === '--version'
     ) {
-        console.log(`  ${brightWhite}v0.4.0-beta.6${reset}\n`);
+        console.log(`  ${brightWhite}v0.4.0-beta.13${reset}\n`);
         process.exit(0);
     }
 
