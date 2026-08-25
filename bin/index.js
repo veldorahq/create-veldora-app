@@ -85,7 +85,7 @@ function generateAppKey() {
 
 async function main() {
     console.log();
-    console.log(`${purple}${bold}  ▲ Veldora Framework${reset} ${dim}v0.4.0-beta.13${reset}`);
+    console.log(`${purple}${bold}  ▲ Veldora Framework${reset} ${dim}v0.4.0-beta.14${reset}`);
     console.log(`${dim}  PHP 8.2+ MVC framework — routing, auth, ORM, CLI, queues, mail, UI components.${reset}`);
     console.log();
 
@@ -145,7 +145,7 @@ async function main() {
         firstArg === '-v' ||
         firstArg === '--version'
     ) {
-        console.log(`  ${brightWhite}v0.4.0-beta.13${reset}\n`);
+        console.log(`  ${brightWhite}v0.4.0-beta.14${reset}\n`);
         process.exit(0);
     }
 
