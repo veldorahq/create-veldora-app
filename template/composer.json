@@ -1,6 +1,7 @@
 {
-    "name": "veldora/app",
-    "description": "A modern Veldora PHP Application",
+    "name": "veldora/veldora",
+    "description": "The Veldora PHP Framework Starter Application",
+    "keywords": ["framework", "veldora", "php", "starter", "template"],
     "license": "MIT",
     "type": "project",
     "require": {
@@ -13,11 +14,23 @@
             "Veldora\\UI\\": "src/UI/"
         },
         "files": [
-            "src/Framework/helpers.php"
+            "src/Framework/helpers.php",
+            "bootstrap/Polyfill.php"
         ]
     },
     "scripts": {
+        "post-create-project-cmd": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
+            "@php veldora key:generate"
+        ],
         "serve": "php veldora serve",
         "migrate": "php veldora migrate"
-    }
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "optimize-autoloader": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
 }

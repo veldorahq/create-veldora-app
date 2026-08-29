@@ -23,7 +23,7 @@ if (file_exists($vendorAutoload)) {
 
 // 1.5. If Symfony Console is not installed via Composer, load built-in polyfill
 if (!class_exists(\Symfony\Component\Console\Command\Command::class, false)) {
-    $polyfill = $basePath . '/src/Framework/Console/Polyfill.php';
+    $polyfill = $basePath . '/bootstrap/Polyfill.php';
     if (file_exists($polyfill)) {
         require_once $polyfill;
     }
