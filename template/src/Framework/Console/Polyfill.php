@@ -10,16 +10,80 @@ declare(strict_types=1);
  * external composer dependencies installed.
  */
 
+namespace Symfony\Component\Console\Formatter {
+    if (!interface_exists(OutputFormatterInterface::class, false)) {
+        interface OutputFormatterInterface
+        {
+            public function format(?string $message): ?string;
+            public function setDecorated(bool $decorated): void;
+            public function isDecorated(): bool;
+        }
+    }
+
+    if (!class_exists(OutputFormatter::class, false)) {
+        class OutputFormatter implements OutputFormatterInterface
+        {
+            protected bool $decorated = true;
+
+            public function __construct(bool $decorated = true)
+            {
+                $this->decorated = $decorated;
+            }
+
+            public function format(?string $message): ?string
+            {
+                if ($message === null) {
+                    return null;
+                }
+                return preg_replace('/<[^>]*>/', '', $message) ?? $message;
+            }
+
+            public function setDecorated(bool $decorated): void
+            {
+                $this->decorated = $decorated;
+            }
+
+            public function isDecorated(): bool
+            {
+                return $this->decorated;
+            }
+        }
+    }
+}
+
 namespace Symfony\Component\Console\Input {
+    if (!class_exists(InputDefinition::class, false)) {
+        class InputDefinition
+        {
+            public function __construct(protected array $definition = []) {}
+            public function setDefinition(array $definition): void { $this->definition = $definition; }
+            public function getDefinition(): array { return $this->definition; }
+            public function getArguments(): array { return []; }
+            public function getOptions(): array { return []; }
+            public function hasArgument(string|int $name): bool { return false; }
+            public function hasOption(string $name): bool { return false; }
+        }
+    }
+
     if (!interface_exists(InputInterface::class, false)) {
         interface InputInterface
         {
-            public function getArgument(string $name): mixed;
+            public function getFirstArgument(): ?string;
+            public function hasParameterOption(string|array $values, bool $onlyParams = false): bool;
+            public function getParameterOption(string|array $values, string|bool|int|float|array|null $default = false, bool $onlyParams = false): mixed;
+            public function bind(InputDefinition $definition): void;
+            public function validate(): void;
             public function getArguments(): array;
-            public function getOption(string $name): mixed;
-            public function getOptions(): array;
+            public function getArgument(string $name): mixed;
+            public function setArgument(string $name, mixed $value): void;
             public function hasArgument(string $name): bool;
+            public function getOptions(): array;
+            public function getOption(string $name): mixed;
+            public function setOption(string $name, mixed $value): void;
             public function hasOption(string $name): bool;
+            public function isInteractive(): bool;
+            public function setInteractive(bool $interactive): void;
+            public function __toString(): string;
         }
     }
 
@@ -61,14 +125,71 @@ namespace Symfony\Component\Console\Input {
     if (!class_exists(ArrayInput::class, false)) {
         class ArrayInput implements InputInterface
         {
-            public function __construct(protected array $parameters = []) {}
+            protected array $parameters;
+            protected bool $interactive = true;
+
+            public function __construct(array $parameters = [])
+            {
+                $this->parameters = $parameters;
+            }
+
+            public function getFirstArgument(): ?string
+            {
+                foreach ($this->parameters as $key => $value) {
+                    if (!str_starts_with((string) $key, '-')) {
+                        return (string) $value;
+                    }
+                }
+                return null;
+            }
+
+            public function hasParameterOption(string|array $values, bool $onlyParams = false): bool
+            {
+                $values = (array) $values;
+                foreach ($values as $value) {
+                    if (array_key_exists($value, $this->parameters) || in_array($value, $this->parameters, true)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            public function getParameterOption(string|array $values, string|bool|int|float|array|null $default = false, bool $onlyParams = false): mixed
+            {
+                $values = (array) $values;
+                foreach ($values as $value) {
+                    if (array_key_exists($value, $this->parameters)) {
+                        return $this->parameters[$value];
+                    }
+                }
+                return $default;
+            }
+
+            public function bind(InputDefinition $definition): void {}
+
+            public function validate(): void {}
+
+            public function getArguments(): array
+            {
+                return $this->parameters;
+            }
 
             public function getArgument(string $name): mixed
             {
                 return $this->parameters[$name] ?? $this->parameters['--' . $name] ?? null;
             }
 
-            public function getArguments(): array
+            public function setArgument(string $name, mixed $value): void
+            {
+                $this->parameters[$name] = $value;
+            }
+
+            public function hasArgument(string $name): bool
+            {
+                return array_key_exists($name, $this->parameters);
+            }
+
+            public function getOptions(): array
             {
                 return $this->parameters;
             }
@@ -78,19 +199,33 @@ namespace Symfony\Component\Console\Input {
                 return $this->parameters['--' . $name] ?? $this->parameters[$name] ?? null;
             }
 
-            public function getOptions(): array
+            public function setOption(string $name, mixed $value): void
             {
-                return $this->parameters;
-            }
-
-            public function hasArgument(string $name): bool
-            {
-                return array_key_exists($name, $this->parameters);
+                $this->parameters['--' . $name] = $value;
             }
 
             public function hasOption(string $name): bool
             {
                 return array_key_exists('--' . $name, $this->parameters) || array_key_exists($name, $this->parameters);
+            }
+
+            public function isInteractive(): bool
+            {
+                return $this->interactive;
+            }
+
+            public function setInteractive(bool $interactive): void
+            {
+                $this->interactive = $interactive;
+            }
+
+            public function __toString(): string
+            {
+                $tokens = [];
+                foreach ($this->parameters as $key => $val) {
+                    $tokens[] = is_string($key) ? "{$key}={$val}" : (string) $val;
+                }
+                return implode(' ', $tokens);
             }
         }
     }
@@ -98,38 +233,129 @@ namespace Symfony\Component\Console\Input {
 
 namespace Symfony\Component\Console\Output {
     use Symfony\Component\Console\Formatter\OutputFormatterInterface;
+    use Symfony\Component\Console\Formatter\OutputFormatter;
 
     if (!interface_exists(OutputInterface::class, false)) {
         interface OutputInterface
         {
-            public function write(string|iterable $messages, bool $newline = false): void;
-            public function writeln(string|iterable $messages): void;
+            public const VERBOSITY_QUIET = 16;
+            public const VERBOSITY_NORMAL = 32;
+            public const VERBOSITY_VERBOSE = 64;
+            public const VERBOSITY_VERY_VERBOSE = 128;
+            public const VERBOSITY_DEBUG = 256;
+
+            public const OUTPUT_NORMAL = 1;
+            public const OUTPUT_RAW = 2;
+            public const OUTPUT_PLAIN = 4;
+
+            public function write(string|iterable $messages, bool $newline = false, int $options = 0): void;
+            public function writeln(string|iterable $messages, int $options = 0): void;
+            public function setVerbosity(int $level): void;
+            public function getVerbosity(): int;
+            public function isQuiet(): bool;
+            public function isVerbose(): bool;
+            public function isVeryVerbose(): bool;
+            public function isDebug(): bool;
+            public function setDecorated(bool $decorated): void;
+            public function isDecorated(): bool;
+            public function setFormatter(OutputFormatterInterface $formatter): void;
+            public function getFormatter(): OutputFormatterInterface;
+        }
+    }
+
+    if (!interface_exists(ConsoleOutputInterface::class, false)) {
+        interface ConsoleOutputInterface extends OutputInterface
+        {
+            public function getErrorOutput(): OutputInterface;
+            public function setErrorOutput(OutputInterface $error): void;
         }
     }
 
     if (!class_exists(ConsoleOutput::class, false)) {
-        class ConsoleOutput implements OutputInterface
+        class ConsoleOutput implements ConsoleOutputInterface
         {
-            public function writeln(string|iterable $messages): void
+            protected int $verbosity = OutputInterface::VERBOSITY_NORMAL;
+            protected bool $decorated = true;
+            protected ?OutputFormatterInterface $formatter = null;
+            protected ?OutputInterface $errorOutput = null;
+
+            public function __construct(
+                int $verbosity = OutputInterface::VERBOSITY_NORMAL,
+                ?bool $decorated = null,
+                ?OutputFormatterInterface $formatter = null
+            ) {
+                $this->verbosity = $verbosity;
+                $this->decorated = $decorated ?? true;
+                $this->formatter = $formatter ?? new OutputFormatter($this->decorated);
+            }
+
+            public function writeln(string|iterable $messages, int $options = 0): void
             {
+                $this->write($messages, true, $options);
+            }
+
+            public function write(string|iterable $messages, bool $newline = false, int $options = 0): void
+            {
+                if ($this->isQuiet()) {
+                    return;
+                }
+
                 $messages = is_iterable($messages) ? $messages : [$messages];
                 foreach ($messages as $message) {
-                    echo $this->stripTags((string) $message) . "\n";
+                    $text = $this->formatMessage((string) $message);
+                    echo $text . ($newline ? "\n" : '');
                 }
             }
 
-            public function write(string|iterable $messages, bool $newline = false): void
+            protected function formatMessage(string $message): string
             {
-                $messages = is_iterable($messages) ? $messages : [$messages];
-                foreach ($messages as $message) {
-                    echo $this->stripTags((string) $message) . ($newline ? "\n" : '');
+                if ($this->isDecorated()) {
+                    // Convert simple Symfony color tags to ANSI terminal colors
+                    $replace = [
+                        '<info>' => "\033[32m",
+                        '</info>' => "\033[0m",
+                        '<comment>' => "\033[33m",
+                        '</comment>' => "\033[0m",
+                        '<error>' => "\033[37;41m",
+                        '</error>' => "\033[0m",
+                        '<question>' => "\033[30;46m",
+                        '</question>' => "\033[0m",
+                        '<fg=red>' => "\033[31m",
+                        '<fg=green>' => "\033[32m",
+                        '<fg=yellow>' => "\033[33m",
+                        '<fg=blue>' => "\033[34m",
+                        '<fg=magenta>' => "\033[35m",
+                        '<fg=cyan>' => "\033[36m",
+                        '<fg=white>' => "\033[37m",
+                        '<fg=gray>' => "\033[90m",
+                        '</>' => "\033[0m",
+                    ];
+                    $formatted = str_replace(array_keys($replace), array_values($replace), $message);
+                    return preg_replace('/<[^>]*>/', '', $formatted) ?? $formatted;
                 }
+
+                return preg_replace('/<[^>]*>/', '', $message) ?? $message;
             }
 
-            protected function stripTags(string $text): string
+            public function setVerbosity(int $level): void { $this->verbosity = $level; }
+            public function getVerbosity(): int { return $this->verbosity; }
+            public function isQuiet(): bool { return $this->verbosity === OutputInterface::VERBOSITY_QUIET; }
+            public function isVerbose(): bool { return $this->verbosity >= OutputInterface::VERBOSITY_VERBOSE; }
+            public function isVeryVerbose(): bool { return $this->verbosity >= OutputInterface::VERBOSITY_VERY_VERBOSE; }
+            public function isDebug(): bool { return $this->verbosity >= OutputInterface::VERBOSITY_DEBUG; }
+            public function setDecorated(bool $decorated): void { $this->decorated = $decorated; }
+            public function isDecorated(): bool { return $this->decorated; }
+            public function setFormatter(OutputFormatterInterface $formatter): void { $this->formatter = $formatter; }
+            public function getFormatter(): OutputFormatterInterface { return $this->formatter ??= new OutputFormatter($this->decorated); }
+
+            public function getErrorOutput(): OutputInterface
             {
-                // Simple color tag stripping or passthrough for ANSI terminals
-                return preg_replace('/<[^>]*>/', '', $text) ?? $text;
+                return $this->errorOutput ??= $this;
+            }
+
+            public function setErrorOutput(OutputInterface $error): void
+            {
+                $this->errorOutput = $error;
             }
         }
     }
@@ -137,8 +363,21 @@ namespace Symfony\Component\Console\Output {
     if (!class_exists(NullOutput::class, false)) {
         class NullOutput implements OutputInterface
         {
-            public function write(string|iterable $messages, bool $newline = false): void {}
-            public function writeln(string|iterable $messages): void {}
+            protected int $verbosity = OutputInterface::VERBOSITY_QUIET;
+            protected ?OutputFormatterInterface $formatter = null;
+
+            public function write(string|iterable $messages, bool $newline = false, int $options = 0): void {}
+            public function writeln(string|iterable $messages, int $options = 0): void {}
+            public function setVerbosity(int $level): void { $this->verbosity = $level; }
+            public function getVerbosity(): int { return $this->verbosity; }
+            public function isQuiet(): bool { return true; }
+            public function isVerbose(): bool { return false; }
+            public function isVeryVerbose(): bool { return false; }
+            public function isDebug(): bool { return false; }
+            public function setDecorated(bool $decorated): void {}
+            public function isDecorated(): bool { return false; }
+            public function setFormatter(OutputFormatterInterface $formatter): void { $this->formatter = $formatter; }
+            public function getFormatter(): OutputFormatterInterface { return $this->formatter ??= new OutputFormatter(false); }
         }
     }
 }
@@ -146,6 +385,7 @@ namespace Symfony\Component\Console\Output {
 namespace Symfony\Component\Console\Command {
     use Symfony\Component\Console\Input\InputInterface;
     use Symfony\Component\Console\Input\ArrayInput;
+    use Symfony\Component\Console\Input\InputDefinition;
     use Symfony\Component\Console\Output\OutputInterface;
     use Symfony\Component\Console\Output\ConsoleOutput;
 
@@ -161,6 +401,7 @@ namespace Symfony\Component\Console\Command {
             protected ?string $help = null;
             protected array $arguments = [];
             protected array $options = [];
+            protected ?InputDefinition $definition = null;
 
             public function __construct(?string $name = null)
             {
@@ -205,7 +446,7 @@ namespace Symfony\Component\Console\Command {
                 return $this->help;
             }
 
-            public function addOption(string $name, ?string $shortcut = null, ?int $mode = null, string $description = '', mixed $default = null): static
+            public function addOption(string $name, string|array|null $shortcut = null, ?int $mode = null, string $description = '', mixed $default = null): static
             {
                 $this->options[$name] = [
                     'shortcut' => $shortcut,
