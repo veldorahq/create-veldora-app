@@ -1,0 +1,77 @@
+name: Release & Publish to npm
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: GitHub Release + npm Publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Extract version
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Extract changelog notes
+        id: changelog
+        run: |
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          VERSION_NO_V="${VERSION#v}"
+          NOTES=$(awk "/^## \[?${VERSION_NO_V}\]?/{flag=1; next} /^## \[?[0-9]/{if(flag) exit} flag" CHANGELOG.md)
+          if [ -z "$NOTES" ]; then
+            NOTES="See [CHANGELOG.md](https://github.com/veldorahq/create-veldora-app/blob/main/CHANGELOG.md) for details."
+          fi
+          {
+            echo 'NOTES<<EOF'
+            echo "$NOTES"
+            echo 'EOF'
+          } >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "create-veldora-app ${{ steps.version.outputs.VERSION }}"
+          body: |
+            ## What's Changed in ${{ steps.version.outputs.VERSION }}
+
+            ${{ steps.changelog.outputs.NOTES }}
+
+            ---
+
+            **Usage:**
+            ```bash
+            npx create-veldora-app@${{ steps.version.outputs.VERSION }} my-app
+            cd my-app
+            php veldora serve
+            ```
+
+            **Full Changelog**: https://github.com/veldorahq/create-veldora-app/blob/main/CHANGELOG.md
+            **Documentation**: https://veldora.modrao.com
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.VERSION, '-') }}
+
+      # NOTE: npm publish requires NPM_TOKEN secret — add it in repo Settings > Secrets
+      - name: Publish to npm
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        # This step will be skipped gracefully if NPM_TOKEN is not set yet
+        continue-on-error: true
