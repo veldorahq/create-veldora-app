@@ -17,6 +17,11 @@ import { execSync } from 'node:child_process';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Read version from package.json dynamically — never hardcode again
+const { version: PKG_VERSION } = JSON.parse(
+    fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8')
+);
+
 // ── Colors & formatting (Clean modern developer palette) ─────────────────────
 const reset = '\x1b[0m';
 const bold = '\x1b[1m';
@@ -85,7 +90,7 @@ function generateAppKey() {
 
 async function main() {
     console.log();
-    console.log(`${purple}${bold}  ▲ Veldora Framework${reset} ${dim}v0.5.0${reset}`);
+    console.log(`${purple}${bold}  ▲ Veldora Framework${reset} ${dim}v${PKG_VERSION}${reset}`);
     console.log(`${dim}  PHP 8.2+ MVC framework — routing, auth, ORM, CLI, queues, mail, UI components.${reset}`);
     console.log();
 
@@ -145,7 +150,7 @@ async function main() {
         firstArg === '-v' ||
         firstArg === '--version'
     ) {
-        console.log(`  ${brightWhite}v0.5.0${reset}\n`);
+        console.log(`  ${brightWhite}v${PKG_VERSION}${reset}\n`);
         process.exit(0);
     }
 
