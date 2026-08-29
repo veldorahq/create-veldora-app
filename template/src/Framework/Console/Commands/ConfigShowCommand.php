@@ -8,6 +8,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Veldora\Framework\Config\Env;
 use Veldora\Framework\Foundation\Application;
 
 class ConfigShowCommand extends Command
