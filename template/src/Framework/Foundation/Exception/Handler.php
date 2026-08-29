@@ -84,10 +84,35 @@ class Handler
             ob_end_clean();
         }
 
-        // CLI: pretty terminal output
-        if (php_sapi_name() === 'cli') {
-            $this->renderConsoleException($e);
-            exit(1);
+        // Validation exception: flash errors and redirect back, or return 422 JSON
+        if ($e instanceof \Veldora\Framework\Validation\ValidationException) {
+            $errors = $e->getErrors();
+            $isJson = isset($_SERVER['HTTP_ACCEPT']) && str_contains($_SERVER['HTTP_ACCEPT'], 'application/json');
+
+            if ($isJson) {
+                if (!headers_sent()) {
+                    http_response_code(422);
+                    header('Content-Type: application/json; charset=UTF-8');
+                }
+                echo json_encode([
+                    'message' => 'The given data was invalid.',
+                    'errors'  => $errors,
+                ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+                exit(422);
+            }
+
+            if (function_exists('session')) {
+                try {
+                    session()->flash('errors', $errors);
+                    session()->flash('_old_input', $_POST ?? []);
+                } catch (\Throwable) {}
+            }
+
+            $referer = $_SERVER['HTTP_REFERER'] ?? '/';
+            if (!headers_sent()) {
+                header("Location: {$referer}");
+            }
+            exit(0);
         }
 
         // Determine status code and debug mode

@@ -36,7 +36,7 @@ class Validator
         protected array $rules,
         protected array $messages = []
     ) {
-        $this->validate();
+        $this->runValidation();
     }
 
     /**
@@ -52,9 +52,24 @@ class Validator
     }
 
     /**
+     * Run the validation routines and return validated data or throw ValidationException.
+     *
+     * @return array<string, mixed>
+     * @throws ValidationException
+     */
+    public function validate(): array
+    {
+        if ($this->fails()) {
+            throw new ValidationException($this);
+        }
+
+        return $this->validated();
+    }
+
+    /**
      * Run the validation routines.
      */
-    protected function validate(): void
+    public function runValidation(): void
     {
         foreach ($this->rules as $attribute => $attributeRules) {
             $value = $this->data[$attribute] ?? null;
@@ -116,6 +131,14 @@ class Validator
     public function fails(): bool
     {
         return !empty($this->errors);
+    }
+
+    /**
+     * Determine if validation passed.
+     */
+    public function passes(): bool
+    {
+        return empty($this->errors);
     }
 
     /**

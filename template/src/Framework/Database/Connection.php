@@ -37,6 +37,24 @@ class Connection
     }
 
     /**
+     * Get the configured database driver name.
+     */
+    public function getDriverName(): string
+    {
+        return (string) ($this->config['driver'] ?? 'sqlite');
+    }
+
+    /**
+     * Get the full database connection configuration.
+     *
+     * @return array<string, mixed>
+     */
+    public function getConfig(): array
+    {
+        return $this->config;
+    }
+
+    /**
      * Connect to the configured driver.
      */
     protected function establishConnection(): PDO

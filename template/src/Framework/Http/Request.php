@@ -251,6 +251,20 @@ class Request
     }
 
     /**
+     * Validate the current request data with rules.
+     *
+     * @param array<string, string|array<mixed>> $rules
+     * @param array<string, string> $messages
+     * @return array<string, mixed>
+     * @throws \Veldora\Framework\Validation\ValidationException
+     */
+    public function validate(array $rules, array $messages = []): array
+    {
+        $validator = \Veldora\Framework\Validation\Validator::make($this->all(), $rules, $messages);
+        return $validator->validate();
+    }
+
+    /**
      * Retrieve a header value.
      */
     public function header(string $key, mixed $default = null): mixed
@@ -349,21 +363,6 @@ class Request
         }
 
         return $this->rawBody;
-    }
-
-    /**
-     * Validate request inputs.
-     *
-     * @param array<string, string|array<mixed>> $rules
-     * @return array<string, mixed>
-     */
-    public function validate(array $rules): array
-    {
-        $validator = new \Veldora\Framework\Validation\Validator($this->all(), $rules);
-        if ($validator->fails()) {
-            throw new \Veldora\Framework\Validation\ValidationException($validator);
-        }
-        return $validator->validated();
     }
 
     /**

@@ -49,6 +49,7 @@ class Router
      * @var array<string>
      */
     protected array $globalMiddleware = [
+        \Veldora\Framework\Http\Middleware\CheckForMaintenanceMode::class,
         \Veldora\Framework\Http\Middleware\StartSession::class,
     ];
 
@@ -249,32 +250,37 @@ class Router
      */
     public function dispatch(Request $request): Response
     {
-        $path = $request->getPath();
-        $method = $request->getMethod();
+        $pipeline = new Pipeline($this->container);
 
-        foreach ($this->routes as $route) {
-            if ($route->matches($path, $method)) {
-                return $this->runRoute($route, $request);
-            }
-        }
+        return $pipeline
+            ->send($request)
+            ->through($this->globalMiddleware)
+            ->then(function (Request $request): Response {
+                $path = $request->getPath();
+                $method = $request->getMethod();
 
-        throw new NotFoundException("Route not found: [{$method}] {$path}");
+                foreach ($this->routes as $route) {
+                    if ($route->matches($path, $method)) {
+                        return $this->runRoute($route, $request);
+                    }
+                }
+
+                throw new NotFoundException("Route not found: [{$method}] {$path}");
+            });
     }
 
     /**
-     * Execute the matched route's action through the middleware pipeline.
+     * Execute the matched route's action through the route middleware pipeline.
      */
     protected function runRoute(Route $route, Request $request): Response
     {
         $pipeline = new Pipeline($this->container);
 
-        // Merge global middleware first, then route-specific ones
         $routeMiddleware = $this->resolveMiddleware($route->getMiddleware());
-        $allMiddleware = array_unique(array_merge($this->globalMiddleware, $routeMiddleware));
 
         $response = $pipeline
             ->send($request)
-            ->through($allMiddleware)
+            ->through($routeMiddleware)
             ->then(function (Request $request) use ($route) {
                 $response = $this->runAction(
                     $route->getAction(),
