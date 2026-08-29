@@ -17,7 +17,7 @@
 
 ## 🚀 Quick Start
 
-Create a new Veldora app using `npx`, `npm init`, `yarn create`, or `pnpm create`:
+### Method 1 — Using npx / npm / yarn / pnpm:
 
 ```bash
 # Using npx (Recommended)
@@ -31,6 +31,12 @@ yarn create veldora-app my-app
 
 # Using pnpm
 pnpm create veldora-app my-app
+```
+
+### Method 2 — Using Composer:
+
+```bash
+composer create-project veldora/veldora my-app
 ```
 
 Then start the built-in development server:
