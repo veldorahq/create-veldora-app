@@ -4,6 +4,14 @@ All notable changes to the `create-veldora-app` npm scaffolder are documented he
 
 ---
 
+## [0.5.6] — 2026-08-30
+
+### Fixed
+- **Dynamic Versioning**: Scaffolding CLI dynamically resolves version from `package.json`.
+- **Lockfile & Release**: Added package lockfile and resilient installation workflow.
+
+---
+
 ## [0.5.0] — 2026-08-25
 
 ### Added
