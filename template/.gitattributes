@@ -1,0 +1,7 @@
+* text=auto eol=lf
+*.php diff=php
+*.md text
+*.json text
+*.css text
+*.js text
+*.svg text

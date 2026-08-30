@@ -220,9 +220,11 @@ async function main() {
         fs.writeFileSync(envExamplePath, exampleContent, 'utf-8');
     }
 
-    // 3. Ensure storage subdirectories and .gitkeeps
+    // 3. Ensure storage subdirectories, database, and .gitkeeps
     const storageDirs = [
         path.join(projectPath, 'storage/framework/views'),
+        path.join(projectPath, 'storage/framework/sessions'),
+        path.join(projectPath, 'storage/framework/cache'),
         path.join(projectPath, 'storage/logs'),
         path.join(projectPath, 'storage/app'),
         path.join(projectPath, 'database'),
@@ -237,14 +239,27 @@ async function main() {
         }
     }
 
-    // 4. Try running composer install
+    // Touch SQLite database
+    const sqlitePath = path.join(projectPath, 'database/database.sqlite');
+    if (!fs.existsSync(sqlitePath)) {
+        fs.writeFileSync(sqlitePath, '', 'utf-8');
+    }
+
+    // 4. Run composer install & migrations
     let composerSuccess = false;
     try {
         process.stdout.write(`  ${dim}Installing dependencies via Composer...${reset} `);
         execSync('composer --version', { stdio: 'ignore' });
-        execSync('composer install --no-interaction --quiet', { cwd: projectPath, stdio: 'ignore' });
+        execSync('composer install --prefer-dist --no-interaction --quiet', { cwd: projectPath, stdio: 'ignore' });
         composerSuccess = true;
         console.log(`${green}✔ Done${reset}`);
+
+        // Run migrations
+        try {
+            execSync('php veldora migrate --graceful', { cwd: projectPath, stdio: 'ignore' });
+        } catch {
+            // Optional migration pass
+        }
     } catch {
         console.log(`${yellow}(composer install skipped or composer not found)${reset}`);
     }
